@@ -1,0 +1,42 @@
+.container {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  margin-top: 25px;
+}
+
+.container>div {
+  text-align: center;
+  border: 1px solid black;
+}
+
+.jp,
+.vi {
+  display: grid;
+  grid-template-columns: 100%;
+}
+
+.jp>button,
+.vi>button {
+  margin: 5px;
+}
+#messsage1, #messsage2 {
+  text-align: center;
+}
+
+@media only screen and (min-width: 468px) {
+
+  .container {
+    margin-top: 25px;
+  }
+
+  .jp, .vi {
+    display: grid;
+    grid-template-columns: 50% 50%;
+  }
+}
+.text-danger {
+  color: red;
+}
+.text-success {
+  color: green;
+}
