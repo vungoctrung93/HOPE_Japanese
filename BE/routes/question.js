@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.get('/', questionController.getQuestions);
 router.post('/', questionController.postAnswer);
-router.get('/nextquestion', questionController.nextQuestions);
+router.get('/nextquestion/:set', questionController.nextQuestions);
 
 module.exports = router;

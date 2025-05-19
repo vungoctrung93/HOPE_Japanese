@@ -12,6 +12,7 @@ const bodyParser = require('body-parser');
 const questionRoutes = require('./routes/question');
 
 const app = express();
+const logger = require('./middleware/logger').logger;
 
 // app.use(bodyParser.urlencoded()); // x-www-form-urlencoded <form>
 app.use(express.json()) // To parse the incoming requests with JSON payloads
