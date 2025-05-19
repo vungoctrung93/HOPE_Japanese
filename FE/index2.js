@@ -1,1 +1,1 @@
-const a = "Some content!0.5505332928871065"
+const a = "Some content!0.2521969764741063"

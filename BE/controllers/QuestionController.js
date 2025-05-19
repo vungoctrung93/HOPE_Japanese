@@ -2,11 +2,12 @@ const fs = require('node:fs');
 const { response } = require('express');
 var { QUESTIONS } = require('../data/questions');
 const { time } = require('node:console');
+const { off } = require('node:process');
 const logger = require('../middleware/logger').logger;
 
 Array.prototype.random = function (ignore, offset, range) {
   let start = offset || 0;
-  let end = typeof range === 'number' ? Math.min(start + range, this.length) : this.length;
+  let end = typeof range === 'number' ? Math.min(start + range, this.length - 1) : this.length;
   let randomIndex = Math.floor(Math.random() * (end - start)) + start;
   while (ignore && ignore.length > 0 && ignore.includes(randomIndex)) {
     randomIndex = Math.floor(Math.random() * (end - start)) + start;
@@ -27,7 +28,6 @@ exports.getQuestions = (req, res, next) => {
 let set = "GOI1";
 let notTestedQuestion1 = {};
 let notTestedQuestion2 = {}
-let rangeIndex = 0;
 const numberOfQuestionInRange = 5;
 
 Object.keys(QUESTIONS).forEach((key) => {
@@ -57,68 +57,73 @@ fs.writeFile('/Users/trung/TermGit/HOPE_Japanese_2/FE/index2.js', localStorageCl
 });
 
 let rightAnswerList = {};
-writeRightAnswerListHtml();
 
 const nextQuestions = (req, res, next) => {
   set = req.params.set ? req.params.set : set;
   const questionSet1 = notTestedQuestion1[set];
-  const offset = rangeIndex * numberOfQuestionInRange;
+  const rangeIndex = QUESTIONS[set].length - notTestedQuestion1[set].length;
+  const offset = rangeIndex - (rangeIndex % numberOfQuestionInRange);
   const range = offset + numberOfQuestionInRange;
+  
+  if(range - offset > 0) {
+    const question1 = questionSet1.random([], offset, range);
+    // Remove question1 from notTestedQuestion1[set] array
+    notTestedQuestion1[set] = questionSet1.filter((q, idx) => idx !== question1.index);
+    notTestedQuestionCount[set] = notTestedQuestion1[set].length;
+    const question1BJp = questionSet1.random([question1.index], offset, range);
+    const question1CJp = questionSet1.random([question1.index, question1BJp.index], offset, range);
+    const question1DJp = questionSet1.random([question1.index, question1BJp.index, question1CJp.index], offset, range);
 
-  const question1 = questionSet1.random([], offset, range);
-  // Remove question1 from notTestedQuestion1[set] array
-  notTestedQuestion1[set] = questionSet1.filter((q, idx) => idx !== question1.index);
-  notTestedQuestionCount[set] = notTestedQuestion1[set].length;
-  const question1BJp = questionSet1.random([question1.index], offset, range);
-  const question1CJp = questionSet1.random([question1.index, question1BJp.index], offset, range);
-  const question1DJp = questionSet1.random([question1.index, question1BJp.index, question1CJp.index], offset, range);
-
-  const question1BVi = questionSet1.random([question1.index], offset, range);
-  const question1CVi = questionSet1.random([question1.index, question1BVi.index], offset, range);
-  const question1DVi = questionSet1.random([question1.index, question1BVi.index, question1CVi.index], offset, range);
+    const question1BVi = questionSet1.random([question1.index], offset, range);
+    const question1CVi = questionSet1.random([question1.index, question1BVi.index], offset, range);
+    const question1DVi = questionSet1.random([question1.index, question1BVi.index, question1CVi.index], offset, range);
 
 
 
-  const questionSet2 = notTestedQuestion2[set];
-  const question2 = questionSet2.random([], offset, range);
-  // Remove question2 from notTestedQuestion2[set] array
-  notTestedQuestion2[set] = questionSet2.filter((q, idx) => idx !== question2.index);
-  const question2BJp = questionSet2.random([question2.index], offset, range);
-  const question2CJp = questionSet2.random([question2.index, question2BJp.index], offset, range);
-  const question2DJp = questionSet2.random([question2.index, question2BJp.index, question2CJp.index], offset, range);
+    const questionSet2 = notTestedQuestion2[set];
+    const question2 = questionSet2.random([], offset, range);
+    // Remove question2 from notTestedQuestion2[set] array
+    notTestedQuestion2[set] = questionSet2.filter((q, idx) => idx !== question2.index);
+    const question2BJp = questionSet2.random([question2.index], offset, range);
+    const question2CJp = questionSet2.random([question2.index, question2BJp.index], offset, range);
+    const question2DJp = questionSet2.random([question2.index, question2BJp.index, question2CJp.index], offset, range);
 
-  const question2BVi = questionSet2.random([question2.index], offset, range);
-  const question2CVi = questionSet2.random([question2.index, question2BVi.index], offset, range);
-  const question2DVi = questionSet2.random([question2.index, question2BVi.index, question2CVi.index], offset, range);
+    const question2BVi = questionSet2.random([question2.index], offset, range);
+    const question2CVi = questionSet2.random([question2.index, question2BVi.index], offset, range);
+    const question2DVi = questionSet2.random([question2.index, question2BVi.index, question2CVi.index], offset, range);
 
-  rangeIndex = rangeIndex + 1;
-
-  q1 = {
-    ro: question1.ro,
-    options: [
-      { jp: question1.jp, vi: question1.vi },
-      { jp: question1BJp.jp, vi: question1BVi.vi },
-      { jp: question1CJp.jp, vi: question1CVi.vi },
-      { jp: question1DJp.jp, vi: question1DVi.vi }
-    ]
-  };
-  q2 = {
-    ro: question2.ro,
-    options: [
-      { jp: question2.jp, vi: question2.vi },
-      { jp: question2BJp.jp, vi: question2BVi.vi },
-      { jp: question2CJp.jp, vi: question2CVi.vi },
-      { jp: question2DJp.jp, vi: question2DVi.vi }
-    ]
-  }
-  const fs = require('node:fs');
-  const content = 'const a = "Some content!' + Math.random() + '"';
-  fs.writeFile('/Users/trung/TermGit/HOPE_Japanese_2/FE/index2.js', content, err => {
-    if (err) {
-      logger.error(err, { at: new Error });
+    q1 = {
+      ro: question1.ro,
+      options: [
+        { jp: question1.jp, vi: question1.vi },
+        { jp: question1BJp.jp, vi: question1BVi.vi },
+        { jp: question1CJp.jp, vi: question1CVi.vi },
+        { jp: question1DJp.jp, vi: question1DVi.vi }
+      ]
+    };
+    q2 = {
+      ro: question2.ro,
+      options: [
+        { jp: question2.jp, vi: question2.vi },
+        { jp: question2BJp.jp, vi: question2BVi.vi },
+        { jp: question2CJp.jp, vi: question2CVi.vi },
+        { jp: question2DJp.jp, vi: question2DVi.vi }
+      ]
     }
-  });
-  res.status(200).json(JSON.stringify({ q1, q2 }));
+    const fs = require('node:fs');
+    const content = 'const a = "Some content!' + Math.random() + '"';
+    fs.writeFile('/Users/trung/TermGit/HOPE_Japanese_2/FE/index2.js', content, err => {
+      if (err) {
+        logger.error(err, { at: new Error });
+      }
+    });
+    writeRightAnswerListHtml();
+    res.status(200).json(JSON.stringify({ q1, q2 }));
+  } else {
+    console.log("error here");
+    
+  }
+
 };
 exports.nextQuestions = nextQuestions;
 
@@ -186,8 +191,8 @@ function writeRightAnswerListHtml() {
         <h1 class="pt-5">Right Answer List</h1>
         <table>
         <tr>
-        <th>Top</th>
-          <th></th>
+          <th>Top</th>
+          <th>Word</th>
           <th>Name</th> 
         </tr>
         ${Object.keys(rightAnswerList).map((jp) => {
