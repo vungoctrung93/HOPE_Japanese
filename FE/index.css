@@ -1,3 +1,7 @@
+body {
+  padding: 0;
+  margin: 0;
+}
 .container {
   display: grid;
   grid-template-columns: 50% 50%;
@@ -13,14 +17,42 @@
 .vi {
   display: grid;
   grid-template-columns: 100%;
+  padding: 0 1vw;
 }
 
-.jp>button,
-.vi>button {
-  margin: 5px;
+div>.jp>div,div>.vi>div {
+  margin-top: 1vh;
+  appearance: none;
+  background-color: #bddaf6;
+  border: 1px solid rgba(27, 31, 35, 0.15);
+  border-radius: 6px;
+  box-sizing: border-box;
+  color: black;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  list-style: none;
+  padding: 6px 16px;
+  position: relative;
+  transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  word-wrap: break-word;
 }
+
+
+
 #messsage1, #messsage2 {
   text-align: center;
+}
+#questionRoQ1, #questionRoQ2 {
+  font-size: 10vw;
+  word-wrap: break-word;
 }
 
 @media only screen and (min-width: 468px) {

@@ -59,19 +59,19 @@ function test() {
         <input id=Q1Name />
         <div id="messsage1"></div>
         <div class="Q1">
-          <h1 id="questionRoQ1">${resJson.q1.ro}</h1>
+          <div id="questionRoQ1">${resJson.q1.ro}</div>
           <div class="jp">
-            <button id="Q1JpA">${q1a.jp}</button>
-            <button id="Q1JpB">${q1b.jp}</button>
-            <button id="Q1JpC">${q1c.jp}</button>
-            <button id="Q1JpD">${q1d.jp}</button>
+            <div id="Q1JpA">${q1a.jp}</div>
+            <div id="Q1JpB">${q1b.jp}</div>
+            <div id="Q1JpC">${q1c.jp}</div>
+            <div id="Q1JpD">${q1d.jp}</div>
           </div>
           <br/>
           <div class="vi">
-            <button id="Q1ViA">${q1a.vi}</button>
-            <button id="Q1ViB">${q1b.vi}</button>
-            <button id="Q1ViC">${q1c.vi}</button>
-            <button id="Q1ViD">${q1d.vi}</button>
+            <div id="Q1ViA">${q1a.vi}</div>
+            <div id="Q1ViB">${q1b.vi}</div>
+            <div id="Q1ViC">${q1c.vi}</div>
+            <div id="Q1ViD">${q1d.vi}</div>
           </div>
         </div>
         `;
@@ -80,19 +80,19 @@ function test() {
         <input id=Q2Name />
         <div id="messsage2"></div>
         <div class="Q2">
-          <h1 id="questionRoQ2">${resJson.q2.ro}</h1>
+          <div id="questionRoQ2">${resJson.q2.ro}</div>
           <div class="jp">
-            <button id="Q2JpA">${q2a.jp}</button>
-            <button id="Q2JpB">${q2b.jp}</button>
-            <button id="Q2JpC">${q2c.jp}</button>
-            <button id="Q2JpD">${q2d.jp}</button>
+            <div id="Q2JpA">${q2a.jp}</div>
+            <div id="Q2JpB">${q2b.jp}</div>
+            <div id="Q2JpC">${q2c.jp}</div>
+            <div id="Q2JpD">${q2d.jp}</div>
           </div>
           <br />
           <div class="vi">
-            <button id="Q2ViA">${q2a.vi}</button>
-            <button id="Q2ViB">${q2b.vi}</button>
-            <button id="Q2ViC">${q2c.vi}</button>
-            <button id="Q2ViD">${q2d.vi}</button>
+            <div id="Q2ViA">${q2a.vi}</div>
+            <div id="Q2ViB">${q2b.vi}</div>
+            <div id="Q2ViC">${q2c.vi}</div>
+            <div id="Q2ViD">${q2d.vi}</div>
           </div>
         </div>
         `;
@@ -109,49 +109,55 @@ function test() {
       document.getElementById("Q2Name").onkeyup = function (event) {
         localStorage.setItem("Q2Name", document.getElementById("Q2Name").value);
       }
+
+      const buttons = document.querySelectorAll("div>.jp>div,div>.vi>div");
+
+      for (let i = 0; i < buttons.length; i++) {
+        console.log(buttons[i]);
+        buttons[i].addEventListener("click", function (e) {
+          console.log(e.target);
+
+          if (document.getElementById("Q1Name").value === "" || document.getElementById("Q2Name").value === "") {
+            alert("Hãy điền tên của cả 2 người");
+            return;
+          }
+          const buttonId = e.target.id;
+
+          document.querySelectorAll(`div.jp>div,div.vi>div`).forEach(button => {
+            if (button.id.includes(buttonId.substr(0, 2))) {
+              button.style.backgroundColor = "";
+              button.style.color = "";
+            }
+          })
+          e.target.style.backgroundColor = "blue";
+          e.target.style.color = "white";
+          const questionRo = document.getElementById("questionRo" + buttonId.substr(0, 2)).innerText;
+          localStorage.setItem(questionRo + buttonId.substr(0, 4), e.target.innerText);
+          const data = {
+            name: document.getElementById(buttonId.substr(0, 2) + "Name").value,
+            ro: questionRo,
+            jp: localStorage.getItem(questionRo + buttonId.substr(0, 2) + "Jp"),
+            vi: localStorage.getItem(questionRo + buttonId.substr(0, 2) + "Vi")
+          }
+          console.log(data);
+
+          if (data.jp && data.vi) {
+            document.querySelectorAll("button").forEach(button => {
+              if (button.id.includes(buttonId.substr(0, 2))) {
+                button.style.backgroundColor = "";
+                button.style.color = "";
+              }
+            })
+            PostAnswer(data);
+          }
+        });
+      }
     })
     .catch(error => console.log("Error: " + error))
 
 
 }
 
-document.addEventListener("click", function (e) {
-  if (e.target.tagName === "BUTTON") {
-    if (document.getElementById("Q1Name").value === "" || document.getElementById("Q2Name").value === "") {
-      alert("Hãy điền tên của cả 2 người");
-      return;
-    }
-    const buttonId = e.target.id;
-
-    document.querySelectorAll("button").forEach(button => {
-      if (button.id.includes(buttonId.substr(0, 2))) {
-        button.style.backgroundColor = "";
-        button.style.color = "";
-      }
-    })
-    e.target.style.backgroundColor = "blue";
-    e.target.style.color = "white";
-    const questionRo = document.getElementById("questionRo" + buttonId.substr(0, 2)).innerText;
-    localStorage.setItem(questionRo + buttonId.substr(0, 4), e.target.innerText);
-    const data = {
-      name: document.getElementById(buttonId.substr(0, 2) + "Name").value,
-      ro: questionRo,
-      jp: localStorage.getItem(questionRo + buttonId.substr(0, 2) + "Jp"),
-      vi: localStorage.getItem(questionRo + buttonId.substr(0, 2) + "Vi")
-    }
-    console.log(data);
-
-    if (data.jp && data.vi) {
-      document.querySelectorAll("button").forEach(button => {
-        if (button.id.includes(buttonId.substr(0, 2))) {
-          button.style.backgroundColor = "";
-          button.style.color = "";
-        }
-      })
-      PostAnswer(data);
-    }
-  }
-});
 
 function PostAnswer(data) {
 
@@ -176,8 +182,8 @@ function PostAnswer(data) {
           question1.style.display = "none";
         } else {
           message1.innerHTML = `<span class="text-danger">NG</span>`;
-      localStorage.removeItem(data.ro + "Q1Jp");
-      localStorage.removeItem(data.ro + "Q1Vi");
+          localStorage.removeItem(data.ro + "Q1Jp");
+          localStorage.removeItem(data.ro + "Q1Vi");
         }
       } else {
         const message2 = document.getElementById("messsage2");
@@ -187,8 +193,8 @@ function PostAnswer(data) {
           question2.style.display = "none";
         } else {
           message2.innerHTML = `<span class="text-danger">NG</span>`;
-      localStorage.removeItem(data.ro + "Q2Jp");
-      localStorage.removeItem(data.ro + "Q2Vi");
+          localStorage.removeItem(data.ro + "Q2Jp");
+          localStorage.removeItem(data.ro + "Q2Vi");
         }
       }
     })
