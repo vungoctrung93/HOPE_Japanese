@@ -20,6 +20,7 @@ function test() {
 
 
       const dataQ1 = {
+        name: localStorage.getItem("Q1Name"),
         ro: resJson.q1.ro,
         jp: localStorage.getItem(resJson.q1.ro + "Q1Jp"),
         vi: localStorage.getItem(resJson.q1.ro + "Q1Vi")
@@ -31,6 +32,7 @@ function test() {
 
 
       const dataQ2 = {
+        name: localStorage.getItem("Q2Name"),
         ro: resJson.q2.ro,
         jp: localStorage.getItem(resJson.q2.ro + "Q2Jp"),
         vi: localStorage.getItem(resJson.q2.ro + "Q2Vi")
