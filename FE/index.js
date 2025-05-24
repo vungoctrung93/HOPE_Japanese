@@ -58,7 +58,6 @@ function test() {
       console.log(q2a.index, q2b.index, q2c.index, q2d.index);
 
       app1.innerHTML = `
-        <input id=Q1Name />
         <div id="messsage1"></div>
         <div class="Q1">
           <div id="questionRoQ1">${resJson.q1.ro}</div>
@@ -76,10 +75,10 @@ function test() {
             <div id="Q1ViD">${q1d.vi}</div>
           </div>
         </div>
+        <input id=Q1Name />
         `;
 
       app2.innerHTML = `
-        <input id=Q2Name />
         <div id="messsage2"></div>
         <div class="Q2">
           <div id="questionRoQ2">${resJson.q2.ro}</div>
@@ -97,6 +96,7 @@ function test() {
             <div id="Q2ViD">${q2d.vi}</div>
           </div>
         </div>
+        <input id=Q2Name />
         `;
       if (localStorage.getItem("Q1Name")) {
         document.getElementById("Q1Name").value = localStorage.getItem("Q1Name");
@@ -115,7 +115,6 @@ function test() {
       const buttons = document.querySelectorAll("div>.jp>div,div>.vi>div");
 
       for (let i = 0; i < buttons.length; i++) {
-        console.log(buttons[i]);
         buttons[i].addEventListener("click", function (e) {
           console.log(e.target);
 
@@ -131,6 +130,10 @@ function test() {
               button.style.color = "";
             }
           })
+          const message = document.getElementById(`messsage${buttonId.substr(1, 1)}`);
+          if(message) {
+            message.innerHTML = ``;
+          }
           e.target.style.backgroundColor = "blue";
           e.target.style.color = "white";
           const questionRo = document.getElementById("questionRo" + buttonId.substr(0, 2)).innerText;
@@ -179,7 +182,7 @@ function PostAnswer(data) {
         const message1 = document.getElementById("messsage1");
 
         if (resJson.jp && resJson.vi) {
-          message1.innerHTML = `<span class="text-success">OK</span>`;
+          message1.innerHTML = `<span class="text-success message top-5">OK</span>`;
           const question1 = document.querySelector(".Q1");
           question1.style.display = "none";
         } else {
@@ -190,7 +193,7 @@ function PostAnswer(data) {
       } else {
         const message2 = document.getElementById("messsage2");
         if (resJson.jp && resJson.vi) {
-          message2.innerHTML = `<span class="text-success">OK</span>`;
+          message2.innerHTML = `<span class="text-success message top-5">OK</span>`;
           const question2 = document.querySelector(".Q2");
           question2.style.display = "none";
         } else {
