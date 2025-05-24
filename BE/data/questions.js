@@ -29,7 +29,7 @@ exports.QUESTIONS = {
     { jp: "こたえ", ro: "kotae", vi: "đáp án - trả lời" },
     { jp: "ばんごう", ro: "bangoo", vi: "số thứ tự" },
     { jp: "まる", ro: "maru", vi: "dấu tròn - đúng" },
-    { jp: "ばつ", ro: "batsu", vi: "dấu sai" },
+    { jp: "ばつ", ro: "batsu", vi: "dấu chéo - sai" },
     { jp: "れい", ro: "ree", vi: "ví dụ" },
     { jp: "かいわをします", ro: "kaiwa (o) shimasu", vi: "thực hành hội thoại" },
     { jp: "いいます", ro: "iimasu", vi: "nói" },

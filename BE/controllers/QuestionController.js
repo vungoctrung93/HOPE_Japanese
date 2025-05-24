@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const { response } = require('express');
 var { QUESTIONS } = require('../data/questions');
-const { time } = require('node:console');
+const { time, log } = require('node:console');
 const { off } = require('node:process');
 const logger = require('../middleware/logger').logger;
 
@@ -14,6 +14,12 @@ Array.prototype.random = function (ignore, offset, range) {
   }
 
   return { ...this[randomIndex], index: randomIndex };
+}
+
+Object.prototype.sortByValueLength = function (smallToBig) {
+  return Object.fromEntries(
+    Object.entries(this).sort(([, a], [, b]) => smallToBig ? a.length - b.length : b.length - a.length)
+  );
 }
 let q1;
 let q2;
@@ -143,13 +149,22 @@ exports.postAnswer = (req, res, next) => {
   if (resp.jp && resp.vi && answer.name) {
 
     logger.debug('right answer: ' + JSON.stringify(answer), { at: new Error });
-    if (!rightAnswerList[question.ro]) {
-      rightAnswerList[question.ro] = []
+    if (!rightAnswerList[answer.name]) {
+      rightAnswerList[answer.name] = []
     }
 
-    rightAnswerList[question.ro].push({ name: answer.name, time: new Date() });
-    logger.debug('rightAnswerList: ' + JSON.stringify(rightAnswerList), { at: new Error });
+    rightAnswerList[answer.name].push({ ro: question.ro, time: new Date() });
 
+    // if (Object.keys(rightAnswerList).length < 30) {
+    //   for (let i = 1; i < 35; i++) {
+    //     if (!rightAnswerList["test" + i]) {
+    //       rightAnswerList["test" + i] = []
+    //     }
+    //     rightAnswerList["test" + i].push({ ro: question.ro, time: new Date() });
+    //   }
+    // }
+    rightAnswerList = rightAnswerList.sortByValueLength();
+    logger.debug('rightAnswerList: ' + JSON.stringify(rightAnswerList), { at: new Error });
 
     writeRightAnswerListHtml();
   }
@@ -158,55 +173,113 @@ exports.postAnswer = (req, res, next) => {
 };
 
 function writeRightAnswerListHtml() {
+
+
+  // Prepare data for chart
+  let chartLabels = Object.keys(rightAnswerList);
+  // Prepare chart data: count of right answers per user
+  let chartCounts = chartLabels.map(name => rightAnswerList[name].length);
+
+  log(chartLabels)
+  log(chartCounts)
+
+
   const content = `
-      <html>
-      <head>
-        <title>Right Answer List</title>
-        <style>
-        table {
-          border-collapse: collapse;
-          width: 100%;
-        }
-        th, td {
-          border: 1px solid black;
-          padding: 8px;
-          text-align: left;
-        }
+    <html>
+    <head>
+      <title>Top 3 Chart</title>
+      <script src="./chart.js"></script>
+      <style>
         .fixed {
           position: fixed;
           top: 20;
         }
         .pt-5 {
-          padding-top: 3rem;
+          padding-top: 3vh;
         }
-        </style>
-      </head>
-      <body>
-        <div class="fixed">
+        .pb-5 {
+          padding-bottom: 3vh;
+        }
+        .mt-5 {
+          margin-top: 3vh;
+        }
+        
+      </style>
+    </head>
+    <body>
+      <div class="fixed">
         ${Object.keys(notTestedQuestionCount).map((key) => {
     return `<button onclick="nextQuestion('${key}')">Next ${key}</button>
-        <span>${notTestedQuestionCount[key]}</span>`;
+          <span>${notTestedQuestionCount[key]}</span>`;
   }).join('')}
-        </div>
-        <h1 class="pt-5">Right Answer List</h1>
-        <table>
-        <tr>
-          <th>Top</th>
-          <th>Word</th>
-          <th>Name</th> 
-        </tr>
-        ${Object.keys(rightAnswerList).map((jp) => {
-    return rightAnswerList[jp].map((item, index) => {
-      if (index < 3) {
-        return `<tr ${index === 0 || index === 1 ? "class='bg-success'" : ""}><td>${index + 1}</td><td>${jp}</td><td>${item.name}</td></tr>`;
-      }
-    }).join('');
-  }).join('')}
-        </table>
-        <script src="manage.js"></script>
-      </body>
-    `;
+      </div> 
+      <canvas id="top3Chart" class="mt-5 pb-5"></canvas>
+      <script>
+        function getFontSize() {
+          // Responsive font size based on window width
+          const width = window.innerWidth || document.documentElement.clientWidth;
+          const fontSize = Math.min(45, width / (${Object.keys(rightAnswerList).length} * 1.5));
+          return fontSize;
+        }
+        const ctx = document.getElementById('top3Chart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ${JSON.stringify(chartLabels.filter((element, index) => index < chartLabels.length))},
+            datasets: [{
+              label: '',
+              data: ${JSON.stringify(chartCounts.filter((element, index) => index < chartCounts.length))},
+              backgroundColor: 'rgba(15, 124, 0, 0.6)'
+            }]
+          },
+          options: {
+            indexAxis: 'x',
+            scales: {
+              x: { 
+                beginAtZero: true,
+                ticks: {
+                  font: {
+                    size: getFontSize()
+                  },
+                  // Rotate x-axis labels by 10 degrees
+                  minRotation: 90,
+                  maxRotation: 90,
+                  color: '#000'
+                }
+              },
+              y: {
+                ticks: {
+                  callback: function(value) {
+                    return Number.isInteger(value) ? value : '';
+                  },
+                  font: {
+                    size: 24
+                  }
+                }
+              }
+            }
+          }
+        });
+      </script>
+      <script src="manage.js"></script>
+    </body>
+    </html>
+  `;
   fs.writeFile('/Users/trung/TermGit/HOPE_Japanese_2/manage/index.html', content, err => {
+    if (err) {
+      logger.error(err, { at: new Error });
+    }
+  });
+  const now = new Date();
+  const pad = n => n.toString().padStart(2, '0');
+  const timestamp = [
+    now.getFullYear(),
+    pad(now.getMonth() + 1),
+    pad(now.getDate()),
+    pad(now.getHours()),
+    pad(Math.floor(now.getMinutes()/5))
+  ].join('-');
+  fs.writeFile(`/Users/trung/Documents/Study/Hope_Japanese/HOPE_Japanese_Bak/bak${timestamp}.json`, JSON.stringify(rightAnswerList), err => {
     if (err) {
       logger.error(err, { at: new Error });
     }
