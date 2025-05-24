@@ -142,7 +142,7 @@ function test() {
           console.log(data);
 
           if (data.jp && data.vi) {
-            document.querySelectorAll("button").forEach(button => {
+            document.querySelectorAll("div.jp>div,div.vi>div").forEach(button => {
               if (button.id.includes(buttonId.substr(0, 2))) {
                 button.style.backgroundColor = "";
                 button.style.color = "";
