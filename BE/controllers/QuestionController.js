@@ -64,8 +64,8 @@ const nextQuestions = (req, res, next) => {
   const rangeIndex = QUESTIONS[set].length - notTestedQuestion1[set].length;
   const offset = rangeIndex - (rangeIndex % numberOfQuestionInRange);
   const range = offset + numberOfQuestionInRange;
-  
-  if(range - offset > 0) {
+
+  if (range - offset > 0) {
     const question1 = questionSet1.random([], offset, range);
     // Remove question1 from notTestedQuestion1[set] array
     notTestedQuestion1[set] = questionSet1.filter((q, idx) => idx !== question1.index);
@@ -121,7 +121,7 @@ const nextQuestions = (req, res, next) => {
     res.status(200).json(JSON.stringify({ q1, q2 }));
   } else {
     console.log("error here");
-    
+
   }
 
 };
@@ -197,7 +197,9 @@ function writeRightAnswerListHtml() {
         </tr>
         ${Object.keys(rightAnswerList).map((jp) => {
     return rightAnswerList[jp].map((item, index) => {
-      return `<tr ${index === 0 || index === 1 ? "class='bg-success'" : ""}><td>${index + 1}</td><td>${jp}</td><td>${item.name}</td></tr>`;
+      if (index < 3) {
+        return `<tr ${index === 0 || index === 1 ? "class='bg-success'" : ""}><td>${index + 1}</td><td>${jp}</td><td>${item.name}</td></tr>`;
+      }
     }).join('');
   }).join('')}
         </table>
