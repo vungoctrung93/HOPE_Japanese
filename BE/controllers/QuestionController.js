@@ -40,13 +40,6 @@ Object.keys(QUESTIONS).forEach((key) => {
   notTestedQuestion1[key] = [...QUESTIONS[key]].sort((a, b) => a.jp.length - b.jp.length);
   notTestedQuestion2[key] = [...QUESTIONS[key]].sort((a, b) => a.jp.length - b.jp.length);
 });
-// console.log(notTestedQuestion1);
-// console.log(notTestedQuestion2);
-let notTestedQuestionCount = {};
-
-Object.keys(QUESTIONS).forEach((key) => {
-  notTestedQuestionCount[key] = QUESTIONS[key].length;
-});
 
 const localStorageClear = `
   const Q1Name = localStorage.getItem("Q1Name");
@@ -75,7 +68,6 @@ const nextQuestions = (req, res, next) => {
     const question1 = questionSet1.random([], offset, range);
     // Remove question1 from notTestedQuestion1[set] array
     notTestedQuestion1[set] = questionSet1.filter((q, idx) => idx !== question1.index);
-    notTestedQuestionCount[set] = notTestedQuestion1[set].length;
     const question1BJp = questionSet1.random([question1.index], offset, range);
     const question1CJp = questionSet1.random([question1.index, question1BJp.index], offset, range);
     const question1DJp = questionSet1.random([question1.index, question1BJp.index, question1CJp.index], offset, range);
@@ -192,7 +184,10 @@ function writeRightAnswerListHtml() {
       <style>
         .fixed {
           position: fixed;
-          top: 20;
+          top: 0;
+          background-color: white;
+          padding: 2.6vh;
+          width: 100%;
         }
         .pt-5 {
           padding-top: 3vh;
@@ -201,16 +196,19 @@ function writeRightAnswerListHtml() {
           padding-bottom: 3vh;
         }
         .mt-5 {
-          margin-top: 3vh;
+          margin-top: 5.1vh;
+        }
+        .pe-5 {
+          padding-right: 3vw;
         }
         
       </style>
     </head>
     <body>
       <div class="fixed">
-        ${Object.keys(notTestedQuestionCount).map((key) => {
+        ${Object.keys(notTestedQuestion1).map((key) => {
     return `<button onclick="nextQuestion('${key}')">Next ${key}</button>
-          <span>${notTestedQuestionCount[key]}</span>`;
+          <span class="pe-5">${QUESTIONS[key]?.length}-${notTestedQuestion1[key]?.length}=${QUESTIONS[key]?.length - notTestedQuestion1[key]?.length}</span>`;
   }).join('')}
       </div> 
       <canvas id="top3Chart" class="mt-5 pb-5"></canvas>
