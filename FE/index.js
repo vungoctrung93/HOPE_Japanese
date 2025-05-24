@@ -166,7 +166,7 @@ function PostAnswer(data) {
     .then(response => {
       const resJson = JSON.parse(response);
       console.log(resJson);
-      if (resJson.ro === document.getElementById("questionRoQ1").innerText) {
+      if (resJson.name === document.getElementById("Q1Name").value) {
 
         const message1 = document.getElementById("messsage1");
 

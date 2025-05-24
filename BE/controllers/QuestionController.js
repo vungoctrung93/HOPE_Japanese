@@ -134,6 +134,7 @@ exports.postAnswer = (req, res, next) => {
   const question = questionSet.find((q) => q.ro === answer.ro);
 
   const resp = {
+    name: answer.name,
     ro: question.ro,
     jp: question.jp === answer.jp,
     vi: question.vi === answer.vi
