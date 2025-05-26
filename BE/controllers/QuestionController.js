@@ -130,15 +130,24 @@ exports.nextQuestions = nextQuestions;
 
 const resetQuestions = (req, res, next) => {
   set = req.params.set ? req.params.set : set;
-  notTestedQuestion1[set] = [...QUESTIONS[set]].sort((a, b) => a.jp.length - b.jp.length);
-  notTestedQuestion2[set] = [...QUESTIONS[set]].sort((a, b) => a.jp.length - b.jp.length);
+  if(set === 'all') {
+    rightAnswerList = {};
+    Object.keys(QUESTIONS).forEach((key) => {
+      notTestedQuestion1[key] = [...QUESTIONS[key]].sort((a, b) => a.jp.length - b.jp.length);
+      notTestedQuestion2[key] = [...QUESTIONS[key]].sort((a, b) => a.jp.length - b.jp.length);
+    });
+  } else {
+    notTestedQuestion1[set] = [...QUESTIONS[set]].sort((a, b) => a.jp.length - b.jp.length);
+    notTestedQuestion2[set] = [...QUESTIONS[set]].sort((a, b) => a.jp.length - b.jp.length);
+  }
 
   fs.writeFileSync('/Users/trung/TermGit/HOPE_Japanese_2/FE/index2.js', localStorageClear, err => {
     if (err) {
       logger.error(err, { at: new Error });
     }
-    nextQuestions(req, res, next);
   });
+
+  nextQuestions(req, res, next);
 
 };
 exports.resetQuestions = resetQuestions;
@@ -191,10 +200,6 @@ function writeRightAnswerListHtml() {
   // Prepare chart data: count of right answers per user
   let chartCounts = chartLabels.map(name => rightAnswerList[name].length);
 
-  log(chartLabels)
-  log(chartCounts)
-
-
   const content = `
     <html>
     <head>
@@ -233,6 +238,7 @@ function writeRightAnswerListHtml() {
         ${Object.keys(notTestedQuestion1).map((key) => {
     return `<button onclick="nextQuestion('${key}')" class="me-1 w-25">Next ${key} ${QUESTIONS[key]?.length}-${notTestedQuestion1[key]?.length}=${QUESTIONS[key]?.length - notTestedQuestion1[key]?.length}</button> <button onclick="resetQuestion('${key}')" class="me-1">&#x21bb;</button>`;
   }).join('')}
+      <button onclick="resetQuestion('all')" class="me-1">&#x21bb; All</button>
       </div> 
       <canvas id="top3Chart" class=""></canvas>
       <script>
