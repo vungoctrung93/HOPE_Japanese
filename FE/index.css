@@ -81,3 +81,7 @@ div>.jp>div,div>.vi>div {
 .text-success {
   color: green;
 }
+
+.hide {
+  display: none;
+}

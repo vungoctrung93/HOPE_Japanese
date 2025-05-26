@@ -18,12 +18,12 @@ function test() {
       const resJson = JSON.parse(response);
       console.log(resJson);
 
-
       const dataQ1 = {
         name: localStorage.getItem("Q1Name"),
         ro: resJson.q1.ro,
         jp: localStorage.getItem(resJson.q1.ro + "Q1Jp"),
-        vi: localStorage.getItem(resJson.q1.ro + "Q1Vi")
+        // if quesion and VI are the same, ignore VI by set same value with question
+        vi: resJson.q1.ro === resJson.q1.options[0].vi ? resJson.q1.ro : localStorage.getItem(resJson.q1.ro + "Q1Vi"),
       }
 
       if (dataQ1.jp && dataQ1.vi) {
@@ -35,7 +35,8 @@ function test() {
         name: localStorage.getItem("Q2Name"),
         ro: resJson.q2.ro,
         jp: localStorage.getItem(resJson.q2.ro + "Q2Jp"),
-        vi: localStorage.getItem(resJson.q2.ro + "Q2Vi")
+        // if quesion and VI are the same, ignore VI by set same value with question
+        vi: resJson.q2.ro === resJson.q2.options[0].vi ? resJson.q2.ro : localStorage.getItem(resJson.q2.ro + "Q2Vi"),
       }
       if (dataQ2.jp && dataQ2.vi) {
         PostAnswer(dataQ2);
@@ -55,7 +56,7 @@ function test() {
       const q2b = resJson.q2.options.random([q2a.index]);
       const q2c = resJson.q2.options.random([q2a.index, q2b.index]);
       const q2d = resJson.q2.options.random([q2a.index, q2b.index, q2c.index]);
-      console.log(q2a.index, q2b.index, q2c.index, q2d.index);
+      
 
       app1.innerHTML = `
         <div id="messsage1"></div>
@@ -67,13 +68,16 @@ function test() {
             <div id="Q1JpC">${q1c.jp}</div>
             <div id="Q1JpD">${q1d.jp}</div>
           </div>
-          <br/>
+          ${resJson.q1.ro !== resJson.q1.options[0].vi ? 
+            `<br/>
           <div class="vi">
             <div id="Q1ViA">${q1a.vi}</div>
             <div id="Q1ViB">${q1b.vi}</div>
             <div id="Q1ViC">${q1c.vi}</div>
             <div id="Q1ViD">${q1d.vi}</div>
-          </div>
+          </div>`
+            : ``
+          }
         </div>
         <input id=Q1Name />
         `;
@@ -88,13 +92,16 @@ function test() {
             <div id="Q2JpC">${q2c.jp}</div>
             <div id="Q2JpD">${q2d.jp}</div>
           </div>
-          <br />
-          <div class="vi">
-            <div id="Q2ViA">${q2a.vi}</div>
-            <div id="Q2ViB">${q2b.vi}</div>
-            <div id="Q2ViC">${q2c.vi}</div>
-            <div id="Q2ViD">${q2d.vi}</div>
-          </div>
+          ${resJson.q1.ro !== resJson.q1.options[0].vi ?  
+            `<br />
+            <div class="vi">
+              <div id="Q2ViA">${q2a.vi}</div>
+              <div id="Q2ViB">${q2b.vi}</div>
+              <div id="Q2ViC">${q2c.vi}</div>
+              <div id="Q2ViD">${q2d.vi}</div>
+            </div>`
+            : ``
+          }
         </div>
         <input id=Q2Name />
         `;
@@ -142,7 +149,8 @@ function test() {
             name: document.getElementById(buttonId.substr(0, 2) + "Name").value,
             ro: questionRo,
             jp: localStorage.getItem(questionRo + buttonId.substr(0, 2) + "Jp"),
-            vi: localStorage.getItem(questionRo + buttonId.substr(0, 2) + "Vi")
+            // if quesion and VI are the same, ignore VI by set same value with question
+            vi: resJson.q1.ro === resJson.q1.options[0].vi ? questionRo : localStorage.getItem(questionRo + buttonId.substr(0, 2) + "Vi")
           }
           console.log(data);
 

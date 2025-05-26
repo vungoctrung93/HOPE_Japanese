@@ -199,20 +199,24 @@ function writeRightAnswerListHtml() {
         .mt-5 {
           margin-top: 5.1vh;
         }
-        .pe-5 {
-          padding-right: 3vw;
+        .me-1 {
+          margin-right: 1vw;
         }
+        .w-25 {
+          width: ${Math.floor(100 / (Object.keys(QUESTIONS).length + 1)/1.3)}vw
+        }
+          
+        
         
       </style>
     </head>
     <body>
-      <div class="fixed">
+      <div>
         ${Object.keys(notTestedQuestion1).map((key) => {
-    return `<button onclick="nextQuestion('${key}')">Next ${key}</button>
-          <span class="pe-5">${QUESTIONS[key]?.length}-${notTestedQuestion1[key]?.length}=${QUESTIONS[key]?.length - notTestedQuestion1[key]?.length}</span>`;
+    return `<button onclick="nextQuestion('${key}')" class="me-1 w-25">Next ${key} ${QUESTIONS[key]?.length}-${notTestedQuestion1[key]?.length}=${QUESTIONS[key]?.length - notTestedQuestion1[key]?.length}</button> <button onclick="resetQuestion('${key}')" class="me-1">&#x21bb;</button>`;
   }).join('')}
       </div> 
-      <canvas id="top3Chart" class="mt-5 pb-5"></canvas>
+      <canvas id="top3Chart" class=""></canvas>
       <script>
         function getFontSize() {
           // Responsive font size based on window width
@@ -276,7 +280,7 @@ function writeRightAnswerListHtml() {
     pad(now.getMonth() + 1),
     pad(now.getDate()),
     pad(now.getHours()),
-    pad(Math.floor(now.getMinutes()/5))
+    pad(Math.floor(now.getMinutes() / 5))
   ].join('-');
   fs.writeFile(`/Users/trung/Documents/Study/Hope_Japanese/HOPE_Japanese_Bak/bak${timestamp}.json`, JSON.stringify(rightAnswerList), err => {
     if (err) {
