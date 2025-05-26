@@ -20,3 +20,19 @@ function nextQuestion(set) {
     })
     .catch(error => console.log("Error: " + error));
 }
+
+
+function resetQuestion(set) {
+  fetch(HOST_URL + "/resetquestion/" + set, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(response => response.json())
+    .then(response => {
+      const resJson = JSON.parse(response);
+      console.log(resJson);
+    })
+    .catch(error => console.log("Error: " + error));
+}

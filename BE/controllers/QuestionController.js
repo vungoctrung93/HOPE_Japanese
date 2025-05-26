@@ -42,6 +42,7 @@ Object.keys(QUESTIONS).forEach((key) => {
 });
 
 const localStorageClear = `
+         
   const Q1Name = localStorage.getItem("Q1Name");
   const Q2Name = localStorage.getItem("Q2Name");
   localStorage.clear();
@@ -49,7 +50,7 @@ const localStorageClear = `
   localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
   console.log("localStorage clear");
   `;
-fs.writeFile('/Users/trung/TermGit/HOPE_Japanese_2/FE/index2.js', localStorageClear, err => {
+fs.writeFileSync('/Users/trung/TermGit/HOPE_Japanese_2/FE/index2.js', localStorageClear, err => {
   if (err) {
     logger.error(err, { at: new Error });
   }
@@ -110,7 +111,7 @@ const nextQuestions = (req, res, next) => {
     }
     const fs = require('node:fs');
     const content = 'const a = "Some content!' + Math.random() + '"';
-    fs.writeFile('/Users/trung/TermGit/HOPE_Japanese_2/FE/index2.js', content, err => {
+    fs.writeFileSync('/Users/trung/TermGit/HOPE_Japanese_2/FE/index2.js', content, err => {
       if (err) {
         logger.error(err, { at: new Error });
       }
@@ -124,6 +125,23 @@ const nextQuestions = (req, res, next) => {
 
 };
 exports.nextQuestions = nextQuestions;
+
+
+
+const resetQuestions = (req, res, next) => {
+  set = req.params.set ? req.params.set : set;
+  notTestedQuestion1[set] = [...QUESTIONS[set]].sort((a, b) => a.jp.length - b.jp.length);
+  notTestedQuestion2[set] = [...QUESTIONS[set]].sort((a, b) => a.jp.length - b.jp.length);
+
+  fs.writeFileSync('/Users/trung/TermGit/HOPE_Japanese_2/FE/index2.js', localStorageClear, err => {
+    if (err) {
+      logger.error(err, { at: new Error });
+    }
+    nextQuestions(req, res, next);
+  });
+
+};
+exports.resetQuestions = resetQuestions;
 
 
 exports.postAnswer = (req, res, next) => {
@@ -268,7 +286,7 @@ function writeRightAnswerListHtml() {
     </body>
     </html>
   `;
-  fs.writeFile('/Users/trung/TermGit/HOPE_Japanese_2/manage/index.html', content, err => {
+  fs.writeFileSync('/Users/trung/TermGit/HOPE_Japanese_2/manage/index.html', content, err => {
     if (err) {
       logger.error(err, { at: new Error });
     }
@@ -282,7 +300,7 @@ function writeRightAnswerListHtml() {
     pad(now.getHours()),
     pad(Math.floor(now.getMinutes() / 5))
   ].join('-');
-  fs.writeFile(`/Users/trung/Documents/Study/Hope_Japanese/HOPE_Japanese_Bak/bak${timestamp}.json`, JSON.stringify(rightAnswerList), err => {
+  fs.writeFileSync(`/Users/trung/Documents/Study/Hope_Japanese/HOPE_Japanese_Bak/bak${timestamp}.json`, JSON.stringify(rightAnswerList), err => {
     if (err) {
       logger.error(err, { at: new Error });
     }
