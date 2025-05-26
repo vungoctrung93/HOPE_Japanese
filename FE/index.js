@@ -197,6 +197,14 @@ function PostAnswer(data) {
           message1.innerHTML = `<span class="text-danger">NG</span>`;
           localStorage.removeItem(data.ro + "Q1Jp");
           localStorage.removeItem(data.ro + "Q1Vi");
+          const loader = document.createElement("div");
+          loader.id = "loader";
+          loader.innerHTML = "Chờ 3 giây để thử lại";
+          message1.appendChild(loader);
+          setTimeout(() => {
+            loader.remove();
+          }, 3000);
+
         }
       } else {
         const message2 = document.getElementById("messsage2");
@@ -208,6 +216,13 @@ function PostAnswer(data) {
           message2.innerHTML = `<span class="text-danger">NG</span>`;
           localStorage.removeItem(data.ro + "Q2Jp");
           localStorage.removeItem(data.ro + "Q2Vi");
+          const loader = document.createElement("div");
+          loader.id = "loader";
+          loader.innerHTML = "Chờ 3 giây để thử lại";
+          message2.appendChild(loader);
+          setTimeout(() => {
+            loader.remove();
+          }, 3000);
         }
       }
     })
