@@ -367,9 +367,8 @@ function writeRightAnswerListHtml() {
         .w-25 {
           width: ${Math.floor(100 / (Object.keys(QUESTIONS).length + 1) / 1.3)}vw
         }
-         
-       
-       
+
+        
       </style>
     </head>
     <body>
@@ -399,6 +398,7 @@ function writeRightAnswerListHtml() {
             }]
           },
           options: {
+            animation: false,
             indexAxis: 'x',
             scales: {
               x: {
@@ -407,7 +407,6 @@ function writeRightAnswerListHtml() {
                   font: {
                     size: getFontSize()
                   },
-                  // Rotate x-axis labels by 10 degrees
                   minRotation: 90,
                   maxRotation: 90,
                   color: '#000'
