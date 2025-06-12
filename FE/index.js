@@ -144,7 +144,17 @@ function test() {
           e.target.style.backgroundColor = "blue";
           e.target.style.color = "white";
           const questionRo = document.getElementById("questionRo" + buttonId.substr(0, 2)).innerText;
+          const Q1Name = localStorage.getItem("Q1Name");
+          const Q2Name = localStorage.getItem("Q2Name");
+          const savedAnswerId = buttonId.substr(2, 2) === 'Vi' ? 'Jp' : 'Vi';
+          const savedAnswer = localStorage.getItem(questionRo + buttonId.substr(0, 2) + savedAnswerId);
+          localStorage.clear();
+          localStorage.setItem("Q1Name", Q1Name? Q1Name : "");
+          localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
           localStorage.setItem(questionRo + buttonId.substr(0, 4), e.target.innerText);
+          if(savedAnswer !== null) {
+            localStorage.setItem(questionRo + buttonId.substr(0, 2) + savedAnswerId, savedAnswer);
+          }
           const data = {
             name: document.getElementById(buttonId.substr(0, 2) + "Name").value,
             ro: questionRo,
