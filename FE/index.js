@@ -61,7 +61,7 @@ function test() {
       app1.innerHTML = `
         <div id="messsage1"></div>
         <div class="Q1">
-          <div id="questionRoQ1">${resJson.q1.ro}</div>
+          <div id="questionRoQ1">${resJson.q1.ro || 'Hết'}</div>
           <div class="jp">
             <div id="Q1JpA">${q1a.jp}</div>
             <div id="Q1JpB">${q1b.jp}</div>

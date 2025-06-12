@@ -3,10 +3,12 @@ body {
   margin: 0;
   margin-top: -25px;
 }
+
 .container {
   display: grid;
   grid-template-columns: 50% 50%;
   margin-top: 25px;
+  padding-bottom: 26vh;
 }
 
 .container>div {
@@ -22,7 +24,9 @@ body {
   padding: 1vw;
 }
 
-div>.jp>div,div>.vi>div {
+div>.jp>div,
+div>.vi>div,
+.btn {
   margin-top: 1vh;
   appearance: none;
   background-color: #bddaf6;
@@ -33,7 +37,6 @@ div>.jp>div,div>.vi>div {
   cursor: pointer;
   display: inline-block;
   font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  font-size: 14px;
   font-weight: 500;
   line-height: 20px;
   list-style: none;
@@ -46,41 +49,125 @@ div>.jp>div,div>.vi>div {
   vertical-align: middle;
   word-wrap: break-word;
 }
+.jp {
+  font-size: 20px;
+}
+.vi {
+  font-size: 14px;
+}
 
 
 
-#messsage1, #messsage2 {
+#messsage1,
+#messsage2, #practice-message {
   position: fixed;
   top: 2px;
-  z-index : 999;
+  z-index: 999;
   background-color: white;
-  border-radius : 15px;
+  border-radius: 15px;
 }
+
 .top-5 {
   position: fixed;
   top: 5vh;
 }
-#questionRoQ1, #questionRoQ2 {
-  font-size: 10vw;
+
+.bg-success {
+  background-color: green;
+}
+
+.text-white {
+  color: white;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btn-parent {
+  width: fit-content;
+}
+
+#next-btn {
+  margin-top: 10px;
+}
+
+#practice-message {
+  font-size: 20px;
+}
+
+
+.Q {
+  font-size: 35px;
+}
+
+.bg-warning {
+  background-color: orange;
+}
+
+.text-danger {
+  color: red;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.pt-5 {
+  padding-top: 5vh;
+}
+.pb-5 {
+  padding-bottom: 5vh;
+}
+
+.mt-5 {
+  margin-top: 5vh;
+}
+
+.bottom-5 {
+  position: fixed;
+  bottom: 5vh;
+}
+.bottom-5.mx-auto {
+  width: 100%;
+  text-align: center;
+}
+#practice-app {
+  padding-top: 10vh;
+  padding-bottom: 20vh;
+}
+
+#questionRoQ1,
+#questionRoQ2 {
+  font-size: 7vw;
   word-wrap: break-word;
+}
+.Q1,.Q2{
+  overflow-y: auto;
+  max-height: 80vh;
 }
 
 @media only screen and (min-width: 468px) {
   body {
     margin-top: 0px;
   }
+
   .container {
     margin-top: 0px;
   }
 
-  .jp, .vi {
+  .jp,
+  .vi {
     display: grid;
     grid-template-columns: 50% 50%;
   }
 }
+
 .text-danger {
   color: red;
 }
+
 .text-success {
   color: green;
 }
@@ -90,10 +177,10 @@ div>.jp>div,div>.vi>div {
 }
 
 #loader {
-  top : 0;
-  left : 0;
-  height : 100vh;
-  width : 49.5vw;
-  z-index : 999;
-  padding-top : 25vh;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 49.5vw;
+  z-index: 999;
+  padding-top: 25vh;
 }

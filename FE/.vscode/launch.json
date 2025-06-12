@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "configurations": [
       {
-        "command": "cd src/BE ; npm run dev",
+        "command": "cd ../BE ; npm start",
         "name": "BE Run npm dev",
         "request": "launch",
         "type": "node-terminal"
