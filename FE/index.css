@@ -71,6 +71,9 @@ div>.vi>div,
   position: fixed;
   top: 5vh;
 }
+.d-none {
+  display: none;
+}
 
 .bg-success {
   background-color: green;
@@ -123,6 +126,9 @@ div>.vi>div,
 
 .mt-5 {
   margin-top: 5vh;
+}
+.w-75 {
+  width: 75%;
 }
 
 .bottom-5 {
