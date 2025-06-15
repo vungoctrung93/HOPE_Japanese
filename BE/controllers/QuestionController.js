@@ -107,13 +107,14 @@ const nextQuestions = (req, res, next) => {
     const question1 = questionSet1.random([], offset, range);
     // Remove question1 from notTestedQuestion1[set] array
     notTestedQuestion1[set] = questionSet1.filter((q, idx) => idx !== question1?.index);
-    const question1BJp = questionSet1.random([question1?.index], offset, range);
-    const question1CJp = questionSet1.random([question1?.index, question1BJp?.index], offset, range);
-    const question1DJp = questionSet1.random([question1?.index, question1BJp?.index, question1CJp?.index], offset, range);
 
-    const question1BVi = questionSet1.random([question1?.index], offset, range);
-    const question1CVi = questionSet1.random([question1?.index, question1BVi?.index], offset, range);
-    const question1DVi = questionSet1.random([question1?.index, question1BVi?.index, question1CVi?.index], offset, range);
+    const question1BJp = question1?.BJp || questionSet1.random([question1?.index], offset, range);
+    const question1CJp = question1?.CJp || questionSet1.random([question1?.index, question1BJp?.index], offset, range);
+    const question1DJp = question1?.DJp || questionSet1.random([question1?.index, question1BJp?.index, question1CJp?.index], offset, range);
+
+    const question1BVi = question1?.BVi || questionSet1.random([question1?.index], offset, range);
+    const question1CVi = question1?.CVi || questionSet1.random([question1?.index, question1BVi?.index], offset, range);
+    const question1DVi = question1?.DVi || questionSet1.random([question1?.index, question1BVi?.index, question1CVi?.index], offset, range);
 
 
 
@@ -121,13 +122,13 @@ const nextQuestions = (req, res, next) => {
     const question2 = questionSet2.random([], offset, range);
     // Remove question2 from notTestedQuestion2[set] array
     notTestedQuestion2[set] = questionSet2.filter((q, idx) => idx !== question2?.index);
-    const question2BJp = questionSet2.random([question2?.index], offset, range);
-    const question2CJp = questionSet2.random([question2?.index, question2BJp?.index], offset, range);
-    const question2DJp = questionSet2.random([question2?.index, question2BJp?.index, question2CJp?.index], offset, range);
+    const question2BJp = question2?.BJp || questionSet2.random([question2?.index], offset, range);
+    const question2CJp = question2?.CJp || questionSet2.random([question2?.index, question2BJp?.index], offset, range);
+    const question2DJp = question2?.DJp || questionSet2.random([question2?.index, question2BJp?.index, question2CJp?.index], offset, range);
 
-    const question2BVi = questionSet2.random([question2?.index], offset, range);
-    const question2CVi = questionSet2.random([question2?.index, question2BVi?.index], offset, range);
-    const question2DVi = questionSet2.random([question2?.index, question2BVi?.index, question2CVi?.index], offset, range);
+    const question2BVi = question2?.BVi || questionSet2.random([question2?.index], offset, range);
+    const question2CVi = question2?.CVi || questionSet2.random([question2?.index, question2BVi?.index], offset, range);
+    const question2DVi = question2?.DVi || questionSet2.random([question2?.index, question2BVi?.index, question2CVi?.index], offset, range);
 
     q1 = {
       ro: question1.ro,
@@ -171,6 +172,7 @@ let notTestedQuestion2SelfPractice = {};
 
 const nextQuestionsSelfPractice = (req, res, next) => {
   const setselfpractice = req.params.set ? req.params.set : 'HIRAGANA';
+  
   // logger.debug(`setselfpractice: ${setselfpractice}`, { at: new Error });
 
   const setselfpracticeQuestionListName = setselfpractice?.split('-')?.[0]
@@ -183,7 +185,7 @@ const nextQuestionsSelfPractice = (req, res, next) => {
   }
   // console.log(notTestedQuestion1SelfPractice[setselfpracticeQuestionStudent]);
   if (!notTestedQuestion1SelfPractice[setselfpracticeQuestionStudent][setselfpracticeQuestionListName] || notTestedQuestion1SelfPractice[setselfpracticeQuestionStudent]?.[setselfpracticeQuestionListName]?.length === 0) {
-    notTestedQuestion1SelfPractice[setselfpracticeQuestionStudent][setselfpracticeQuestionListName] = JSON.parse(JSON.stringify(QUESTIONS[setselfpracticeQuestionListName].sort((a, b) => a.jp.length - b.jp.length)))
+    notTestedQuestion1SelfPractice[setselfpracticeQuestionStudent][setselfpracticeQuestionListName] = JSON.parse(JSON.stringify(QUESTIONS[setselfpracticeQuestionListName]?.sort((a, b) => a.jp.length - b.jp.length)))
     notTestedQuestion2SelfPractice[setselfpracticeQuestionStudent][setselfpracticeQuestionListName] = JSON.parse(JSON.stringify(QUESTIONS[setselfpracticeQuestionListName].sort((a, b) => a.jp.length - b.jp.length)))
   }
   // logger.debug(`notTestedQuestion1SelfPractice-${setselfpracticeQuestionListName}: ${notTestedQuestion1SelfPractice[setselfpracticeQuestionStudent]?.[setselfpracticeQuestionListName]?.length}`, { at: new Error });
@@ -210,13 +212,13 @@ const nextQuestionsSelfPractice = (req, res, next) => {
   const question1 = questionSet1.random([], offset, range);
   // Remove question1 from notTestedQuestion1[setselfpracticeQuestionStudent] array
   notTestedQuestion1SelfPractice[setselfpracticeQuestionStudent][setselfpracticeQuestionListName] = notTestedQuestion1SelfPractice[setselfpracticeQuestionStudent][setselfpracticeQuestionListName].filter((q, idx) => idx !== question1?.index);
-  const question1BJp = questionSet1.random([question1?.index], offset, range);
-  const question1CJp = questionSet1.random([question1?.index, question1BJp?.index], offset, range);
-  const question1DJp = questionSet1.random([question1?.index, question1BJp?.index, question1CJp?.index], offset, range);
+  const question1BJp = question1?.BJp || questionSet1.random([question1?.index], offset, range);
+  const question1CJp = question1?.CJp || questionSet1.random([question1?.index, question1BJp?.index], offset, range);
+  const question1DJp = question1?.DJp || questionSet1.random([question1?.index, question1BJp?.index, question1CJp?.index], offset, range);
 
-  const question1BVi = questionSet1.random([question1?.index], offset, range);
-  const question1CVi = questionSet1.random([question1?.index, question1BVi?.index], offset, range);
-  const question1DVi = questionSet1.random([question1?.index, question1BVi?.index, question1CVi?.index], offset, range);
+  const question1BVi = question1?.BVi || questionSet1.random([question1?.index], offset, range);
+  const question1CVi = question1?.CVi || questionSet1.random([question1?.index, question1BVi?.index], offset, range);
+  const question1DVi = question1?.DVi || questionSet1.random([question1?.index, question1BVi?.index, question1CVi?.index], offset, range);
 
 
 
@@ -299,12 +301,14 @@ exports.postAnswer = (req, res, next) => {
     return res.status(400).json({ error: 'No question set found' });
   }
   const question = questionSet.find((q) => q.ro === answer.ro);
-
+  if(!question){
+    logger.debug('bug', { at: new Error })
+  }
   const resp = {
     name: answer.name,
-    ro: question.ro,
-    jp: question.jp === answer.jp,
-    vi: question.vi === answer.vi
+    ro: question?.ro,
+    jp: question?.jp === answer.jp,
+    vi: question?.vi === answer.vi
   }
   // logger.debug('doubleAnswer: ' + doubleAnswer(resp), { at: new Error });
   if (resp.jp && resp.vi && answer.name && !doubleAnswer(resp)) {
@@ -367,8 +371,6 @@ function writeRightAnswerListHtml() {
         .w-25 {
           width: ${Math.floor(100 / (Object.keys(QUESTIONS).length + 1) / 1.3)}vw
         }
-
-        
       </style>
     </head>
     <body>

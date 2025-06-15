@@ -209,11 +209,11 @@ function PostAnswer(data) {
           localStorage.removeItem(data.ro + "Q1Vi");
           const loader = document.createElement("div");
           loader.id = "loader";
-          loader.innerHTML = "Chờ 3 giây để thử lại";
+          loader.innerHTML = "Chờ 1 giây để thử lại";
           message1.appendChild(loader);
           setTimeout(() => {
             loader.remove();
-          }, 3000);
+          }, 1000);
 
         }
       } else {
@@ -228,11 +228,11 @@ function PostAnswer(data) {
           localStorage.removeItem(data.ro + "Q2Vi");
           const loader = document.createElement("div");
           loader.id = "loader";
-          loader.innerHTML = "Chờ 3 giây để thử lại";
+          loader.innerHTML = "Chờ 1 giây để thử lại";
           message2.appendChild(loader);
           setTimeout(() => {
             loader.remove();
-          }, 3000);
+          }, 1000);
         }
       }
     })
