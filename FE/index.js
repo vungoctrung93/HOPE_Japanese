@@ -68,7 +68,7 @@ function test() {
             <div id="Q1JpC">${q1c.jp}</div>
             <div id="Q1JpD">${q1d.jp}</div>
           </div>
-          ${resJson.q1.ro !== resJson.q1.options[0].vi ? 
+          ${resJson.q1.options[0].vi && resJson.q1.ro !== resJson.q1.options[0].vi ? 
             `<br/>
           <div class="vi">
             <div id="Q1ViA">${q1a.vi}</div>
@@ -92,7 +92,7 @@ function test() {
             <div id="Q2JpC">${q2c.jp}</div>
             <div id="Q2JpD">${q2d.jp}</div>
           </div>
-          ${resJson.q1.ro !== resJson.q1.options[0].vi ?  
+          ${resJson.q2.options[0].vi && resJson.q2.ro !== resJson.q2.options[0].vi ?  
             `<br />
             <div class="vi">
               <div id="Q2ViA">${q2a.vi}</div>
@@ -164,7 +164,7 @@ function test() {
           }
           console.log(data);
 
-          if (data.jp && data.vi) {
+          if (data.jp && (data.vi || !resJson.q1.options[0].vi )) {
             document.querySelectorAll("div.jp>div,div.vi>div").forEach(button => {
               if (button.id.includes(buttonId.substr(0, 2))) {
                 button.style.backgroundColor = "";

@@ -308,7 +308,7 @@ exports.postAnswer = (req, res, next) => {
     name: answer.name,
     ro: question?.ro,
     jp: question?.jp === answer.jp,
-    vi: question?.vi === answer.vi
+    vi: question?.vi === answer.vi || !question.vi
   }
   // logger.debug('doubleAnswer: ' + doubleAnswer(resp), { at: new Error });
   if (resp.jp && resp.vi && answer.name && !doubleAnswer(resp)) {
