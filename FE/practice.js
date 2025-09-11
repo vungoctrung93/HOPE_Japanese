@@ -62,11 +62,11 @@ function nextQuestionSelfPractice(nextSetName) {
           <label style="cursor:pointer;">
         Trắc nghiệm <input type="radio" name="typeOrSelect" value="select" class="radio" ${localStorage.getItem('typeOrSelect') !== "type" ? "checked" : ""}/>
           </label>
-          <button class="btn next-btn bg-success text-white">GOI1</button>
-          <button class="btn next-btn bg-success text-white">HIRAGANA</button>
-          <button class="btn next-btn bg-success text-white">KATAKANA</button>
-          <button class="btn next-btn bg-success text-white">KANJI1</button>
-          <button class="btn next-btn bg-success text-white">OLD CLASS</button>
+          <button class="btn next-btn bg-primary">GOI1</button>
+          <button class="btn next-btn bg-primary">HIRAGANA</button>
+          <button class="btn next-btn bg-primary">KATAKANA</button>
+          <button class="btn next-btn bg-primary">KANJI1</button>
+          <button class="btn next-btn bg-primary">OLD CLASS</button>
           </div>
       `;
       const jpInput = document.getElementById('jpInput');

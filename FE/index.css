@@ -79,6 +79,10 @@ div>.vi>div,
   background-color: green;
 }
 
+.bg-primary {
+  background-color: #7abfff;
+}
+
 .text-white {
   color: white;
 }
