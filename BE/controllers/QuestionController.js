@@ -255,7 +255,13 @@ const resetQuestions = async (req, res, next) => {
     pad(now.getHours()),
     pad(Math.floor(now.getMinutes() / 5))
   ].join('-');
-  fs.writeFileSync(`${path.resolve(path.resolve(__dirname, '..'), '..')}/bak/bak${timestamp}.json`, JSON.stringify(rightAnswerList), err => {
+  const rightAnswerListSize = Object.keys(rightAnswerList).map(key => {
+    let person = {};
+    person[key] = rightAnswerList[key].length;
+    return person;
+  })
+  logger.debug(`rightAnswerListSize: ${JSON.stringify(rightAnswerListSize)}`, { at: new Error });
+  fs.writeFileSync(`${path.resolve(path.resolve(__dirname, '..'), '..')}/bak/bak${timestamp}.json`, JSON.stringify(rightAnswerListSize), err => {
     if (err) {
       logger.error(err, { at: new Error });
     }
