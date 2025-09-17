@@ -38,24 +38,9 @@ function nextQuestionSelfPractice(nextSetName) {
       const setStatus = q.setStatus;
       // Shuffle options for randomness
       const shuffled = options.map((v, i) => ({ ...v, index: i })).sort(() => Math.random() - 0.5);
-      const typeOrSelect = document.getElementsByName("typeOrSelect")
-      // if typeOrSelect are type, make input text instead of div.jp
-
+      
       app.innerHTML = `
-        <div id="practice-message"></div>
-        <div class="Q">
-          <div id="questionRo" class="text-center">${q.ro}　　　${setStatus}</div>
-          <div id="questionJPType" class="mx-auto text-center">
-            <input id="jpInput" type="text" class="w-75" autocomplete="off" placeholder="Nhập tiếng Nhật: "/>
-          </div>
-          <div id="questionJPSelect">
-            <div class="jp pt-5">
-              ${shuffled.map((opt, idx) => opt.jp ? `<div id="Jp${idx}" class='btn'>${opt.jp}</div>` : '').join('')}
-            </div>
-          </div>
-          ${options[0].vi && q.ro !== options[0].vi ? `<br/><div class="vi">${shuffled.map((opt, idx) => opt.vi ? `<div id="Vi${idx}" class='btn'>${opt.vi}</div>` : '').join('')}</div>` : ''}
-        </div>
-        <div class="pt-5">
+        <div class="py-1">
           <label style="cursor:pointer;">
         Gõ <input type="radio" name="typeOrSelect" value="type" class="radio" ${localStorage.getItem('typeOrSelect') === "type" ? "checked" : ""}/>
           </label>
@@ -67,7 +52,20 @@ function nextQuestionSelfPractice(nextSetName) {
           <button class="btn next-btn bg-primary">KATAKANA</button>
           <button class="btn next-btn bg-primary">KANJI1</button>
           <button class="btn next-btn bg-primary">OLD CLASS</button>
+        </div>
+        <div id="practice-message"></div>
+        <div class="Q">
+          <div id="questionRo" class="text-center">${localStorage.getItem('typeOrSelect') === "type" ? q.options[0].jp : q.ro}　　　${setStatus}</div>
+          <div id="questionJPType" class="mx-auto text-center">
+            <input id="jpInput" type="text" class="w-75" autocomplete="off" placeholder="Nhập Romaji: "/>
           </div>
+          <div id="questionJPSelect">
+            <div class="jp pt-5">
+              ${shuffled.map((opt, idx) => opt.jp ? `<div id="Jp${idx}" class='btn'>${opt.jp}</div>` : '').join('')}
+            </div>
+          </div>
+          ${options[0].vi && q.ro !== options[0].vi ? `<br/><div class="vi">${shuffled.map((opt, idx) => opt.vi ? `<div id="Vi${idx}" class='btn'>${opt.vi}</div>` : '').join('')}</div>` : ''}
+        </div>
       `;
       const jpInput = document.getElementById('jpInput');
       if(localStorage.getItem("typeOrSelect") === "type") {
@@ -99,9 +97,11 @@ function nextQuestionSelfPractice(nextSetName) {
             jpInput.focus();
             document.getElementById('questionJPSelect').classList.add("d-none");
             document.getElementById('questionJPType').classList.remove("d-none");
+            questionRo.innerHTML = q.options[0].jp + "　　　" + setStatus;
           }else {
             document.getElementById('questionJPSelect').classList.remove("d-none");
             document.getElementById('questionJPType').classList.add("d-none");
+            questionRo.innerHTML = q.ro + "　　　" + setStatus;
           }
         });
       });

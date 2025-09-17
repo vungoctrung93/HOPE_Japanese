@@ -7,7 +7,60 @@ Array.prototype.random = function (ignore) {
   return { ...this[randomIndex], index: randomIndex };
 }
 const HOST_URL = window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":8080";
+
+
+
+window.addEventListener('DOMContentLoaded', async () => {
+
+
+  const inputField = document.getElementById('field_code');
+  const filed_code_cache = localStorage.getItem("field_code");
+  if (filed_code_cache) {
+    // if filed_code_cache time is more than 5 minutes, clear it
+    const cacheTime = parseInt(filed_code_cache.split("___")[1]);
+    const currentTime = Date.now();
+    if (currentTime - cacheTime > 4 * 60 * 60 * 1000) {
+      localStorage.removeItem("field_code");
+    } else {
+      // if filed_code_cache time is less than 5 minutes, set it to inputField
+      inputField.value = filed_code_cache.split("___")[0];
+    }
+  }
+
+
+  const { initializeApp } = await import('./lib/firebase-app.js');
+  const { getDatabase, ref, get, set, update, onValue, connectDatabaseEmulator } = await import('./lib/firebase-database.js');
+  const firebaseConfig = {
+    databaseURL: window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":9000/?ns=hopejapaneseshiken"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  connectDatabaseEmulator(db, window.location.href.split(":")[1], 9000);
+  const rootRef = ref(db, "questions");
+  onValue(rootRef, (snapshot) => {
+    const data = snapshot.val();
+    // document.getElementById("test").innerHTML = JSON.stringify(data);
+    console.log(JSON.stringify(data));
+    test();
+  });
+
+  onValue(ref(db, "clearStorage"), (snapshot) => {
+    // const data = snapshot.val();
+    const Q1Name = localStorage.getItem("Q1Name");
+    const Q2Name = localStorage.getItem("Q2Name");
+    localStorage.clear();
+    localStorage.setItem("Q1Name", Q1Name? Q1Name : "");
+    localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
+    console.log("localStorage clear");
+  });
+  
+  
+
+});
+
 function test() {
+  
   fetch(HOST_URL, {
     headers: {
       'Content-Type': 'application/json'
@@ -183,7 +236,8 @@ function test() {
 
 
 function PostAnswer(data) {
-
+  console.log(data);
+  
   fetch(HOST_URL, {
     method: "POST",
     headers: {
@@ -209,11 +263,11 @@ function PostAnswer(data) {
           localStorage.removeItem(data.ro + "Q1Vi");
           const loader = document.createElement("div");
           loader.id = "loader";
-          loader.innerHTML = "Chờ 1 giây để thử lại";
+          loader.innerHTML = "Chờ 3 giây để thử lại";
           message1.appendChild(loader);
           setTimeout(() => {
             loader.remove();
-          }, 1000);
+          }, 3000);
 
         }
       } else {
@@ -228,11 +282,11 @@ function PostAnswer(data) {
           localStorage.removeItem(data.ro + "Q2Vi");
           const loader = document.createElement("div");
           loader.id = "loader";
-          loader.innerHTML = "Chờ 1 giây để thử lại";
+          loader.innerHTML = "Chờ 3 giây để thử lại";
           message2.appendChild(loader);
           setTimeout(() => {
             loader.remove();
-          }, 1000);
+          }, 3000);
         }
       }
     })

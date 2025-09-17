@@ -35,11 +35,6 @@ Array.prototype.random = function (ignore, offset, range) {
   return { ...this[randomIndex], index: randomIndex };
 }
 
-Object.prototype.sortByValueLength = function (smallToBig) {
-  return Object.fromEntries(
-    Object.entries(this).sort(([, a], [, b]) => smallToBig ? a.length - b.length : b.length - a.length)
-  );
-}
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -68,27 +63,14 @@ Object.keys(QUESTIONS).forEach((key) => {
 });
 
 const path = require('path')
+const { getFirebaseDB } = require('../config/firebase');
 
-function localStorageClear() {
 
-  const localStorageClear = `
-         
-  const Q1Name = localStorage.getItem("Q1Name");
-  const Q2Name = localStorage.getItem("Q2Name");
-  localStorage.clear();
-  localStorage.setItem("Q1Name", Q1Name? Q1Name : "");
-  localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
-  console.log("localStorage clear");
-  `;
-
-  fs.writeFileSync(`${path.resolve(path.resolve(__dirname, '..'), '..')}/fe/index2.js`, localStorageClear, err => {
-    if (err) {
-      logger.error(err, { at: new Error });
-    }
-  });
-
-}
-localStorageClear();
+const db = getFirebaseDB();
+db.ref('clearStorage').set(JSON.stringify({
+  timestamp: new Date().toISOString()
+}));
+db.ref('QUESTIONS').set(QUESTIONS);
 
 let rightAnswerList = {};
 
@@ -148,14 +130,16 @@ const nextQuestions = (req, res, next) => {
         { jp: question2DJp.jp, vi: question2DVi.vi }
       ]
     }
-    const fs = require('node:fs');
-    const content = 'const a = "Some content!' + Math.random() + '"';
-    fs.writeFileSync(`${path.resolve(path.resolve(__dirname, '..'), '..')}/fe/index2.js`, content, err => {
-      if (err) {
-        logger.error(err, { at: new Error });
-      }
+    
+    db.ref('questions').set(JSON.stringify({
+      timestamp: new Date().toISOString()
+    }));
+
+    db.ref('manage').set({
+      notTestedQuestion1,
+      rightAnswerList: rightAnswerList,
+      //timestamp: new Date().toISOString()
     });
-    writeRightAnswerListHtml();
     res.status(200).json(JSON.stringify({ q1, q2 }));
   } else {
     console.log("error here");
@@ -259,8 +243,31 @@ exports.nextQuestionsSelfPractice = nextQuestionsSelfPractice;
 
 
 const resetQuestions = async (req, res, next) => {
+
+
+
+  const now = new Date();
+  const pad = n => n.toString().padStart(2, '0');
+  const timestamp = [
+    now.getFullYear(),
+    pad(now.getMonth() + 1),
+    pad(now.getDate()),
+    pad(now.getHours()),
+    pad(Math.floor(now.getMinutes() / 5))
+  ].join('-');
+  fs.writeFileSync(`${path.resolve(path.resolve(__dirname, '..'), '..')}/bak/bak${timestamp}.json`, JSON.stringify(rightAnswerList), err => {
+    if (err) {
+      logger.error(err, { at: new Error });
+    }
+  });
+
   set = req.params.set ? req.params.set : set;
-  localStorageClear();
+  
+  db.ref('clearStorage').set(JSON.stringify({
+    notTestedQuestion1,
+    rightAnswerList,
+    timestamp: new Date().toISOString()
+  }));
   if (set === 'all') {
     rightAnswerList = {};
     Object.keys(QUESTIONS).forEach((key) => {
@@ -288,15 +295,17 @@ function doubleAnswer(resp) {
   })
   return found;
 }
-
+function removeSpecialChars(str) {
+  const specialChars = [".", "#", "$", "/", "[", "]"];
+  str = str.replace(/\.|\#|$|\/|\[|\]/g, "");
+  return str;
+}
 exports.postAnswer = (req, res, next) => {
   const answer = req.body;
   // logger.debug('answer: ' + JSON.stringify(answer), { at: new Error });
 
   const questionSet = QUESTIONS[set];
   if (!questionSet || questionSet.length === 0) {
-    console.log(set);
-
     logger.error('No question set found for set: ' + set, { at: new Error });
     return res.status(400).json({ error: 'No question set found' });
   }
@@ -314,11 +323,12 @@ exports.postAnswer = (req, res, next) => {
   if (resp.jp && resp.vi && answer.name && !doubleAnswer(resp)) {
 
     // logger.debug('right answer: ' + JSON.stringify(answer), { at: new Error });
-    if (!rightAnswerList[answer.name]) {
-      rightAnswerList[answer.name] = []
+    const answerName = removeSpecialChars(answer.name.trim());
+    if (!rightAnswerList[answerName]) {
+      rightAnswerList[answerName] = []
     }
 
-    rightAnswerList[answer.name].push({ ro: question.ro, time: new Date() });
+    rightAnswerList[answerName].push({ ro: question.ro, time: new Date() });
 
     // if (Object.keys(rightAnswerList).length < 30) {
     //   for (let i = 1; i < 35; i++) {
@@ -328,128 +338,16 @@ exports.postAnswer = (req, res, next) => {
     //     rightAnswerList["test" + i].push({ ro: question.ro, time: new Date() });
     //   }
     // }
-    rightAnswerList = rightAnswerList.sortByValueLength();
-    writeRightAnswerListHtml();
+    // rightAnswerList = sortByValueLength(rightAnswerList);
+    
+    
+    db.ref('manage').set({
+      notTestedQuestion1,
+      rightAnswerList,
+      //timestamp: new Date().toISOString()
+    });
+
     // logger.debug('rightAnswerList: ' + JSON.stringify(rightAnswerList), { at: new Error });
   }
   res.status(200).json(JSON.stringify(resp));
 };
-
-function writeRightAnswerListHtml() {
-
-
-  // Prepare data for chart
-  let chartLabels = Object.keys(rightAnswerList);
-  // Prepare chart data: count of right answers per user
-  let chartCounts = chartLabels.map(name => rightAnswerList[name].length);
-
-  const content = `
-    <html>
-    <head>
-      <title>Top 3 Chart</title>
-      <script src="./chart.js"></script>
-      <style>
-        .fixed {
-          position: fixed;
-          top: 0;
-          background-color: white;
-          padding: 2.6vh;
-          width: 100%;
-        }
-        .pt-5 {
-          padding-top: 3vh;
-        }
-        .pb-5 {
-          padding-bottom: 3vh;
-        }
-        .mt-5 {
-          margin-top: 5.1vh;
-        }
-        .me-1 {
-          margin-right: 1vw;
-        }
-        .w-25 {
-          width: ${Math.floor(100 / (Object.keys(QUESTIONS).length + 1) / 1.3)}vw
-        }
-      </style>
-    </head>
-    <body>
-      <div>
-        ${Object.keys(notTestedQuestion1).map((key) => {
-    return `<button onclick="nextQuestion('${key}')" class="me-1 w-25">${key} ${QUESTIONS[key]?.length - notTestedQuestion1[key]?.length}/${QUESTIONS[key]?.length}</button> <button onclick="resetQuestion('${key}')" class="me-1">&#x21bb;</button>`;
-  }).join('')}
-      <button onclick="resetQuestion('all')" class="me-1">&#x21bb; All</button>
-      </div>
-      <canvas id="top3Chart" class=""></canvas>
-      <script>
-        function getFontSize() {
-          // Responsive font size based on window width
-          const width = window.innerWidth || document.documentElement.clientWidth;
-          const fontSize = Math.min(45, width / (${Object.keys(rightAnswerList).length} * 1.5));
-          return fontSize;
-        }
-        const ctx = document.getElementById('top3Chart').getContext('2d');
-        new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: ${JSON.stringify(chartLabels.filter((element, index) => index < chartLabels.length))},
-            datasets: [{
-              label: '',
-              data: ${JSON.stringify(chartCounts.filter((element, index) => index < chartCounts.length))},
-              backgroundColor: 'rgba(15, 124, 0, 0.6)'
-            }]
-          },
-          options: {
-            animation: false,
-            indexAxis: 'x',
-            scales: {
-              x: {
-                beginAtZero: true,
-                ticks: {
-                  font: {
-                    size: getFontSize()
-                  },
-                  minRotation: 90,
-                  maxRotation: 90,
-                  color: '#000'
-                }
-              },
-              y: {
-                ticks: {
-                  callback: function(value) {
-                    return Number.isInteger(value) ? value : '';
-                  },
-                  font: {
-                    size: 24
-                  }
-                }
-              }
-            },
-            aspectRatio: 2.5
-          }
-        });
-      </script>
-      <script src="manage.js"></script>
-    </body>
-    </html>
-  `;
-  fs.writeFileSync(`${path.resolve(path.resolve(__dirname, '..'), '..')}/manage/index.html`, content, err => {
-    if (err) {
-      logger.error(err, { at: new Error });
-    }
-  });
-  const now = new Date();
-  const pad = n => n.toString().padStart(2, '0');
-  const timestamp = [
-    now.getFullYear(),
-    pad(now.getMonth() + 1),
-    pad(now.getDate()),
-    pad(now.getHours()),
-    pad(Math.floor(now.getMinutes() / 5))
-  ].join('-');
-  fs.writeFileSync(`${path.resolve(path.resolve(__dirname, '..'), '..')}/bak/bak${timestamp}.json`, JSON.stringify(rightAnswerList), err => {
-    if (err) {
-      logger.error(err, { at: new Error });
-    }
-  });
-}
