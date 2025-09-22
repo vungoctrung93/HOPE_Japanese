@@ -36,8 +36,11 @@ document.addEventListener("DOMContentLoaded", async function () {
       const QUESTIONS = snapshot.val();
       onValue(ref(db, "manage"), (snapshotManage) => {
         if (snapshotManage.exists()) {
-          let { notTestedQuestion1, rightAnswerList } = snapshotManage.val();
+          let { notTestedQuestion1, rightAnswerList, q1, q2 } = snapshotManage.val();
           console.log("manage", snapshotManage.val());
+
+          document.getElementById("q1").innerHTML = `Q1: ${q1}`;
+          document.getElementById("q2").innerHTML = `Q2: ${q2}`;
 
           document.getElementById("ContentButton").innerHTML = `
             ${Object.keys(QUESTIONS).map((key) => {

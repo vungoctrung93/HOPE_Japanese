@@ -6,6 +6,21 @@
 const HOST_URL = window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":8080";
 
 let setName;
+let QUESTIONS = {};
+
+window.addEventListener('DOMContentLoaded', async () => {
+
+  const res = await fetch(HOST_URL + "/questionsData", {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+  const response = await res.json();
+  QUESTIONS = JSON.parse(response);
+  nextQuestionSelfPractice();
+  console.log(QUESTIONS);
+});
 
 function nextQuestionSelfPractice(nextSetName) {
   if (!localStorage.getItem("Q1Name") || localStorage.getItem("Q1Name") === '') {
@@ -38,29 +53,29 @@ function nextQuestionSelfPractice(nextSetName) {
       const setStatus = q.setStatus;
       // Shuffle options for randomness
       const shuffled = options.map((v, i) => ({ ...v, index: i })).sort(() => Math.random() - 0.5);
-      
       app.innerHTML = `
-        <div class="py-1">
-          <label style="cursor:pointer;">
-        Gõ <input type="radio" name="typeOrSelect" value="type" class="radio" ${localStorage.getItem('typeOrSelect') === "type" ? "checked" : ""}/>
-          </label>
-          <label style="cursor:pointer;">
-        Trắc nghiệm <input type="radio" name="typeOrSelect" value="select" class="radio" ${localStorage.getItem('typeOrSelect') !== "type" ? "checked" : ""}/>
-          </label>
-          <button class="btn next-btn bg-primary">GOI1</button>
-          <button class="btn next-btn bg-primary">HIRAGANA</button>
-          <button class="btn next-btn bg-primary">KATAKANA</button>
-          <button class="btn next-btn bg-primary">KANJI1</button>
-          <button class="btn next-btn bg-primary">OLD CLASS</button>
+        <div class="mt-5">
+          ${Object.keys(QUESTIONS).map((key) => {
+            return `<button onclick="nextQuestion('${key}')" class="btn next-btn bg-primary">${key}</button>`;
+          }).join('')}
+          <a href="./" class="btn bg-warning text-white">Quay lại trang luyện tập chung</a>
         </div>
         <div id="practice-message"></div>
-        <div class="Q">
+        <div class="Question">
+          <div class="mx-auto text-center">
+            <label style="cursor:pointer;">
+              Gõ <input type="radio" name="typeOrSelect" value="type" class="radio" ${localStorage.getItem('typeOrSelect') === "type" ? "checked" : ""}/>
+            </label>
+            <label style="cursor:pointer;">
+              Trắc nghiệm <input type="radio" name="typeOrSelect" value="select" class="radio" ${localStorage.getItem('typeOrSelect') !== "type" ? "checked" : ""}/>
+            </label>
+          </div>
           <div id="questionRo" class="text-center">${localStorage.getItem('typeOrSelect') === "type" ? q.options[0].jp : q.ro}　　　${setStatus}</div>
           <div id="questionJPType" class="mx-auto text-center">
-            <input id="jpInput" type="text" class="w-75" autocomplete="off" placeholder="Nhập Romaji: "/>
+            <input id="jpInput" type="text" class="w-75" autocomplete="off" placeholder="Nhập ${ setName.toLowerCase().includes("kanji") ? "hiragana" : "romaji" } "/>
           </div>
           <div id="questionJPSelect">
-            <div class="jp pt-5">
+            <div class="jp">
               ${shuffled.map((opt, idx) => opt.jp ? `<div id="Jp${idx}" class='btn'>${opt.jp}</div>` : '').join('')}
             </div>
           </div>
@@ -79,7 +94,7 @@ function nextQuestionSelfPractice(nextSetName) {
       // if typeOrSelect value is type, focus on jpInput
       if (jpInput) {
         jpInput.addEventListener('keyup', function () {
-          if (jpInput.value.trim().replace("　", "") === q.options[0].jp) {
+          if (jpInput.value.trim().replace("　", "").toLowerCase() === q.ro.toLowerCase()) {
             jpInput.style.backgroundColor = "green"
             jpInput.style.color = "white"
           } else {
@@ -135,4 +150,3 @@ function nextQuestionSelfPractice(nextSetName) {
     .catch(error => console.log("Error: " + error));
 }
 
-document.addEventListener('DOMContentLoaded', nextQuestionSelfPractice);

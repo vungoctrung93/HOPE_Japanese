@@ -51,6 +51,9 @@ exports.getQuestions = (req, res, next) => {
   }
   res.status(200).json(JSON.stringify({ q1, q2 }));
 };
+exports.getQUESTIONSData = (req, res, next) => {
+  res.status(200).json(JSON.stringify(QUESTIONS));
+};
 
 let set = "GOI1";
 let notTestedQuestion1 = {};
@@ -136,6 +139,7 @@ const nextQuestions = (req, res, next) => {
     }));
 
     db.ref('manage').set({
+      q1, q2,
       notTestedQuestion1,
       rightAnswerList: rightAnswerList,
       //timestamp: new Date().toISOString()

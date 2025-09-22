@@ -8,7 +8,11 @@ Array.prototype.random = function (ignore) {
 }
 const HOST_URL = window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":8080";
 
-
+document.addEventListener('scroll', (e) => {
+    if (scrollLock && document.documentElement.scrollTop > 100) {
+        document.documentElement.scrollTop = 100;
+    }
+});
 
 window.addEventListener('DOMContentLoaded', async () => {
 
@@ -116,18 +120,18 @@ function test() {
         <div class="Q1">
           <div id="questionRoQ1">${resJson.q1.ro || 'Hết'}</div>
           <div class="jp">
-            <div id="Q1JpA">${q1a.jp}</div>
-            <div id="Q1JpB">${q1b.jp}</div>
-            <div id="Q1JpC">${q1c.jp}</div>
-            <div id="Q1JpD">${q1d.jp}</div>
+            <div id="Q1JpA" class='mt-3'>${q1a.jp}</div>
+            <div id="Q1JpB" class='mt-3'>${q1b.jp}</div>
+            <div id="Q1JpC" class='mt-3'>${q1c.jp}</div>
+            <div id="Q1JpD" class='mt-3'>${q1d.jp}</div>
           </div>
           ${resJson.q1.options[0].vi && resJson.q1.ro !== resJson.q1.options[0].vi ? 
             `<br/>
           <div class="vi">
-            <div id="Q1ViA">${q1a.vi}</div>
-            <div id="Q1ViB">${q1b.vi}</div>
-            <div id="Q1ViC">${q1c.vi}</div>
-            <div id="Q1ViD">${q1d.vi}</div>
+            <div id="Q1ViA" class='mt-3'>${q1a.vi}</div>
+            <div id="Q1ViB" class='mt-3'>${q1b.vi}</div>
+            <div id="Q1ViC" class='mt-3'>${q1c.vi}</div>
+            <div id="Q1ViD" class='mt-3'>${q1d.vi}</div>
           </div>`
             : ``
           }
@@ -140,18 +144,18 @@ function test() {
         <div class="Q2">
           <div id="questionRoQ2">${resJson.q2.ro}</div>
           <div class="jp">
-            <div id="Q2JpA">${q2a.jp}</div>
-            <div id="Q2JpB">${q2b.jp}</div>
-            <div id="Q2JpC">${q2c.jp}</div>
-            <div id="Q2JpD">${q2d.jp}</div>
+            <div id="Q2JpA" class='mt-3'>${q2a.jp}</div>
+            <div id="Q2JpB" class='mt-3'>${q2b.jp}</div>
+            <div id="Q2JpC" class='mt-3'>${q2c.jp}</div>
+            <div id="Q2JpD" class='mt-3'>${q2d.jp}</div>
           </div>
           ${resJson.q2.options[0].vi && resJson.q2.ro !== resJson.q2.options[0].vi ?  
             `<br />
             <div class="vi">
-              <div id="Q2ViA">${q2a.vi}</div>
-              <div id="Q2ViB">${q2b.vi}</div>
-              <div id="Q2ViC">${q2c.vi}</div>
-              <div id="Q2ViD">${q2d.vi}</div>
+              <div id="Q2ViA" class='mt-3'>${q2a.vi}</div>
+              <div id="Q2ViB" class='mt-3'>${q2b.vi}</div>
+              <div id="Q2ViC" class='mt-3'>${q2c.vi}</div>
+              <div id="Q2ViD" class='mt-3'>${q2d.vi}</div>
             </div>`
             : ``
           }
