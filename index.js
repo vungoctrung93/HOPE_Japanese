@@ -80,7 +80,7 @@ function test() {
         ro: resJson.q1.ro,
         jp: localStorage.getItem(resJson.q1.ro + "Q1Jp"),
         // if quesion and VI are the same, ignore VI by set same value with question
-        vi: resJson.q1.ro === resJson.q1.options[0].vi ? resJson.q1.ro : localStorage.getItem(resJson.q1.ro + "Q1Vi"),
+        vi: resJson.q1.ro === (resJson.q1.options[0] && resJson.q1.options[0].vi) ? resJson.q1.ro : localStorage.getItem(resJson.q1.ro + "Q1Vi"),
       }
 
       if (dataQ1.jp && dataQ1.vi) {
@@ -93,7 +93,7 @@ function test() {
         ro: resJson.q2.ro,
         jp: localStorage.getItem(resJson.q2.ro + "Q2Jp"),
         // if quesion and VI are the same, ignore VI by set same value with question
-        vi: resJson.q2.ro === resJson.q2.options[0].vi ? resJson.q2.ro : localStorage.getItem(resJson.q2.ro + "Q2Vi"),
+        vi: resJson.q2.ro === (resJson.q2.options[0] && resJson.q2.options[0].vi) ? resJson.q2.ro : localStorage.getItem(resJson.q2.ro + "Q2Vi"),
       }
       if (dataQ2.jp && dataQ2.vi) {
         PostAnswer(dataQ2);
@@ -125,7 +125,7 @@ function test() {
             <div id="Q1JpC" class='mt-3'>${q1c.jp}</div>
             <div id="Q1JpD" class='mt-3'>${q1d.jp}</div>
           </div>
-          ${resJson.q1.options[0].vi && resJson.q1.ro !== resJson.q1.options[0].vi ? 
+          ${resJson.q1.options[0] && resJson.q1.options[0].vi && resJson.q1.ro !== resJson.q1.options[0].vi ? 
             `<br/>
           <div class="vi">
             <div id="Q1ViA" class='mt-3'>${q1a.vi}</div>
@@ -149,7 +149,7 @@ function test() {
             <div id="Q2JpC" class='mt-3'>${q2c.jp}</div>
             <div id="Q2JpD" class='mt-3'>${q2d.jp}</div>
           </div>
-          ${resJson.q2.options[0].vi && resJson.q2.ro !== resJson.q2.options[0].vi ?  
+          ${resJson.q2.options[0] && resJson.q2.options[0].vi && resJson.q2.ro !== resJson.q2.options[0].vi ?  
             `<br />
             <div class="vi">
               <div id="Q2ViA" class='mt-3'>${q2a.vi}</div>
@@ -217,11 +217,11 @@ function test() {
             ro: questionRo,
             jp: localStorage.getItem(questionRo + buttonId.substr(0, 2) + "Jp"),
             // if quesion and VI are the same, ignore VI by set same value with question
-            vi: resJson.q1.ro === resJson.q1.options[0].vi ? questionRo : localStorage.getItem(questionRo + buttonId.substr(0, 2) + "Vi")
+            vi: resJson.q1.ro === resJson.q1.options[0] && resJson.q1.options[0].vi ? questionRo : localStorage.getItem(questionRo + buttonId.substr(0, 2) + "Vi")
           }
           console.log(data);
 
-          if (data.jp && (data.vi || !resJson.q1.options[0].vi )) {
+          if (data.jp && (data.vi || !(resJson.q1.options[0] && resJson.q1.options[0].vi))) {
             document.querySelectorAll("div.jp>div,div.vi>div").forEach(button => {
               if (button.id.includes(buttonId.substr(0, 2))) {
                 button.style.backgroundColor = "";
