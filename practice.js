@@ -10,13 +10,14 @@ const HOST_URL = window.location.href.split(":")[0] + ":" + window.location.href
 let setName;
 let setInputbyJP;
 let QUESTIONS = {};
+let correctQuizAnswer = false;
+let correctTypeAnswer = false;
+let answerChecked = false;
 let notTestedQuestion1SelfPractice = localStorage.getItem("notTestedQuestion1SelfPractice") ? JSON.parse(localStorage.getItem("notTestedQuestion1SelfPractice")) : {};
 
 window.addEventListener('DOMContentLoaded', async () => {
 
   setInputbyJP = (await import('./const.js')).setInputbyJP;
-  console.log(setInputbyJP);
-
 
   const res = await fetch(HOST_URL + "/questionsData", {
     method: 'GET',
@@ -27,8 +28,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   const response = await res.json();
   QUESTIONS = JSON.parse(response);
   nextQuestionSelfPractice();
-  console.log(QUESTIONS);
-
 });
 
 
@@ -67,7 +66,6 @@ const nextQuestionSelfPractices = (set ) => {
   const range = numberOfQuestionIgnoreRangeHiraKata;
   // logger offser and range
   // logger.debug(`offset: ${offset}, range: ${range}`, { at: new Error });
-  console.log(questionSet1);
   
   const question1 = questionSet1.random([], offset, range);
   // Remove question1 from notTestedQuestion1[setselfpracticeQuestionStudent] array
@@ -99,7 +97,30 @@ const nextQuestionSelfPractices = (set ) => {
 };
 let firebaseApp;
 let db;
+
+async function setFirebaseValue(path, value) {
+  console.log(path, value);
+  
+  // when type correct answer, save to firebase
+  const { initializeApp } = await import('./lib/firebase-app.js');
+  const { getDatabase, ref, get, set, update, onValue, connectDatabaseEmulator } = await import('./lib/firebase-database.js');
+  const firebaseConfig = {
+    databaseURL: window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":9000/?ns=hopejapaneseshiken"
+  };
+  if(!firebaseApp) {
+    firebaseApp = await initializeApp(firebaseConfig);
+    db = getDatabase(firebaseApp);
+    connectDatabaseEmulator(db, window.location.href.split(":")[1], 9000);
+  }
+  set(ref(db, path), value);
+  // set(ref(db, "SelfPractice/" + studentName + "/type2_" + setName + jpInput.value.trim().toLowerCase()), true);
+}
+
+
 function nextQuestionSelfPractice(nextSetName) {
+  correctQuizAnswer = false;
+  correctTypeAnswer = false;
+  answerChecked = false;
   if (!localStorage.getItem("Q1Name") || localStorage.getItem("Q1Name") === '') {
     alert("Hãy quay lại trang trước và điền tên của cả 2 người");
     document.location = "./";
@@ -116,7 +137,6 @@ function nextQuestionSelfPractice(nextSetName) {
   const setStatus = q.setStatus;
   // Shuffle options for randomness
   const shuffled = options.map((v, i) => ({ ...v, index: i })).sort(() => Math.random() - 0.5);
-  console.log(setInputbyJP);
   
   app.innerHTML = `
     <div class="mt-5">
@@ -168,24 +188,14 @@ function nextQuestionSelfPractice(nextSetName) {
       
       
       if ((jpInput.value.trim().toLowerCase() === q.ro.toLowerCase() && !setInputbyJP.includes(setName)) || (jpInput.value.trim() === q.options[0].jp && setInputbyJP.includes(setName))){
+        correctTypeAnswer = true;
         jpInput.style.backgroundColor = "green"
         jpInput.style.color = "white"
-
-        // when type correct answer, save to firebase
-        const { initializeApp } = await import('./lib/firebase-app.js');
-        const { getDatabase, ref, get, set, update, onValue, connectDatabaseEmulator } = await import('./lib/firebase-database.js');
-        const firebaseConfig = {
-          databaseURL: window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":9000/?ns=hopejapaneseshiken"
-        };
-        if(!firebaseApp) {
-          firebaseApp = await initializeApp(firebaseConfig);
-          db = getDatabase(firebaseApp);
-          connectDatabaseEmulator(db, window.location.href.split(":")[1], 9000);
+        if((correctQuizAnswer || q.options[0].vi === undefined || q.options[0].vi === '') && !answerChecked) {
+          // student Name
+          const studentName = localStorage.getItem("Q1Name") ? localStorage.getItem("Q1Name") : 'Người chơi 1' + Math.floor(Math.random() * 1000000);
+          setFirebaseValue("SelfPractice/" + studentName + "/type1_" + setName + jpInput.value.trim().toLowerCase(), setInputbyJP.includes(setName) ? jpInput.value.trim().length : 1);
         }
-        // student Name
-        const studentName = localStorage.getItem("Q1Name") ? localStorage.getItem("Q1Name") : 'Người chơi 1' + Math.floor(Math.random() * 1000000);
-        set(ref(db, "SelfPractice/" + studentName + "/type1_" + setName + jpInput.value.trim().toLowerCase()), setInputbyJP.includes(setName) ? jpInput.value.trim().length : 1);
-        // set(ref(db, "SelfPractice/" + studentName + "/type2_" + setName + jpInput.value.trim().toLowerCase()), true);
       } else {
         jpInput.style.backgroundColor = ""
         jpInput.style.color = ""
@@ -197,6 +207,7 @@ function nextQuestionSelfPractice(nextSetName) {
   document.querySelectorAll('input[name="typeOrSelect"]').forEach(radio => {
     radio.addEventListener('change', function (e) {
       localStorage.setItem('typeOrSelect', e.target.value);
+      answerChecked = true;
       if (e.target.value === "type") {
         jpInput.focus();
         jpInput.select();
@@ -220,25 +231,15 @@ function nextQuestionSelfPractice(nextSetName) {
           b.style.color = '';
         });
         // Show result
-        const isCorrect = (e.target.innerText === q.options[0].jp || e.target.innerText === q.options[0].vi);
+        correctQuizAnswer = (e.target.innerText === q.options[0].jp || e.target.innerText === q.options[0].vi);
         const msg = document.getElementById('practice-message');
-        if (isCorrect) {
+        if (correctQuizAnswer) {
           e.target.style.backgroundColor = 'green';
-          // msg.innerHTML = '<b class="text-success message">Đúng!</b>';
-
-          // const { initializeApp } = await import('./lib/firebase-app.js');
-          // const { getDatabase, ref, get, set, update, onValue, connectDatabaseEmulator } = await import('./lib/firebase-database.js');
-          // const firebaseConfig = {
-          //   databaseURL: window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":9000/?ns=hopejapaneseshiken"
-          // };
-          // if(!firebaseApp) {
-          //   firebaseApp = await initializeApp(firebaseConfig);
-          //   db = getDatabase(firebaseApp);
-          //   connectDatabaseEmulator(db, window.location.href.split(":")[1], 9000);
-          // }
-          // // student Name
-          // const studentName = localStorage.getItem("Q1Name") ? localStorage.getItem("Q1Name") : 'Người chơi 1' + Math.floor(Math.random() * 1000000);
-          // set(ref(db, "SelfPractice/" + studentName + "/" + setName + e.target.innerText), true);
+          if(correctTypeAnswer) {
+            // student Name
+            const studentName = localStorage.getItem("Q1Name") ? localStorage.getItem("Q1Name") : 'Người chơi 1' + Math.floor(Math.random() * 1000000);
+            setFirebaseValue("SelfPractice/" + studentName + "/type1_" + setName + jpInput.value.trim().toLowerCase(), setInputbyJP.includes(setName) ? jpInput.value.trim().length : 1);
+          }
         } else {
           e.target.style.backgroundColor = 'red';
           e.target.style.color = 'white';
