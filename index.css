@@ -142,6 +142,12 @@ body {
 .w-75 {
   width: 75%;
 }
+.no-selectable {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+}
 
 .bottom-5 {
   position: fixed;

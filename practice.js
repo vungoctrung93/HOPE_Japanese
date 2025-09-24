@@ -4,13 +4,19 @@
 
 const numberOfQuestionInRange = 5;
 
+
 const HOST_URL = window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":8080";
 
 let setName;
+let setInputbyJP;
 let QUESTIONS = {};
 let notTestedQuestion1SelfPractice = localStorage.getItem("notTestedQuestion1SelfPractice") ? JSON.parse(localStorage.getItem("notTestedQuestion1SelfPractice")) : {};
 
 window.addEventListener('DOMContentLoaded', async () => {
+
+  setInputbyJP = (await import('./const.js')).setInputbyJP;
+  console.log(setInputbyJP);
+
 
   const res = await fetch(HOST_URL + "/questionsData", {
     method: 'GET',
@@ -61,7 +67,8 @@ const nextQuestionSelfPractices = (set ) => {
   const range = numberOfQuestionIgnoreRangeHiraKata;
   // logger offser and range
   // logger.debug(`offset: ${offset}, range: ${range}`, { at: new Error });
-
+  console.log(questionSet1);
+  
   const question1 = questionSet1.random([], offset, range);
   // Remove question1 from notTestedQuestion1[setselfpracticeQuestionStudent] array
   notTestedQuestion1SelfPractice[setselfpracticeQuestionStudent][setselfpracticeQuestionListName] = notTestedQuestion1SelfPractice[setselfpracticeQuestionStudent][setselfpracticeQuestionListName].filter((q, idx) => idx !== question1.index);
@@ -102,10 +109,6 @@ function nextQuestionSelfPractice(nextSetName) {
 
   const set = setName + '-' + localStorage.getItem("Q1Name");
   const resJson = nextQuestionSelfPractices(set);
-
-  console.log(resJson);
-
-
   const app = document.getElementById('practice-app');
 
   const q = resJson.q1;
@@ -113,6 +116,8 @@ function nextQuestionSelfPractice(nextSetName) {
   const setStatus = q.setStatus;
   // Shuffle options for randomness
   const shuffled = options.map((v, i) => ({ ...v, index: i })).sort(() => Math.random() - 0.5);
+  console.log(setInputbyJP);
+  
   app.innerHTML = `
     <div class="mt-5">
       <a href="./" class="btn bg-warning text-white">Quay lại trang luyện tập chung</a>
@@ -127,9 +132,9 @@ function nextQuestionSelfPractice(nextSetName) {
           Trắc nghiệm <input type="radio" name="typeOrSelect" value="select" class="radio" ${localStorage.getItem('typeOrSelect') !== "type" ? "checked" : ""}/>
         </label>
       </div>
-      <div id="questionRo" class="text-center">${localStorage.getItem('typeOrSelect') === "type" ? q.options[0].jp : q.ro}　　　${setStatus}</div>
+      <div id="questionRo" class="text-center no-selectable">${localStorage.getItem('typeOrSelect') === "type" && !setInputbyJP.includes(setName) ? q.options[0].jp : q.ro}　　　${setStatus}</div>
       <div id="questionJPType" class="mx-auto text-center">
-        <input id="jpInput" type="text" class="w-75" autocomplete="off" placeholder="Nhập ${ setName.toLowerCase().includes("kanji") || setName.toLowerCase().includes("old class") ? "hiragana" : "romaji" } "/>
+        <input id="jpInput" type="text" class="w-75" autocomplete="off" placeholder="Nhập ${ setName.toLowerCase().includes("kanji") || setName.toLowerCase().includes("old class") || setName.toLowerCase().includes("bunpo1") ? "hiragana" : "romaji" } "/>
       </div>
       <div id="questionJPSelect">
         <div class="jp">
@@ -156,7 +161,13 @@ function nextQuestionSelfPractice(nextSetName) {
   // if typeOrSelect value is type, focus on jpInput
   if (jpInput) {
     jpInput.addEventListener('keyup', async function () {
-      if ((jpInput.value.trim().replace("　", "").toLowerCase() === q.ro.toLowerCase() && setName !== 'OLD CLASS') || (jpInput.value.trim().replace("　", "") === q.options[0].jp && setName === 'OLD CLASS')){
+
+      console.log(jpInput.value.trim().toLowerCase() === q.ro.toLowerCase() && !setInputbyJP.includes(setName));
+      console.log(jpInput.value.trim().toLowerCase(), q.ro.toLowerCase(), setName);
+      console.log(jpInput.value.trim() === q.options[0].jp && setInputbyJP.includes(setName));
+      
+      
+      if ((jpInput.value.trim().toLowerCase() === q.ro.toLowerCase() && !setInputbyJP.includes(setName)) || (jpInput.value.trim() === q.options[0].jp && setInputbyJP.includes(setName))){
         jpInput.style.backgroundColor = "green"
         jpInput.style.color = "white"
 
@@ -173,8 +184,8 @@ function nextQuestionSelfPractice(nextSetName) {
         }
         // student Name
         const studentName = localStorage.getItem("Q1Name") ? localStorage.getItem("Q1Name") : 'Người chơi 1' + Math.floor(Math.random() * 1000000);
-        set(ref(db, "SelfPractice/" + studentName + "/type1_" + setName + jpInput.value.trim().replace("　", "").toLowerCase()), setName.toLowerCase().includes("kanji") || setName.toLowerCase().includes("old class") ? jpInput.value.trim().replace("　", "").length : 1);
-        // set(ref(db, "SelfPractice/" + studentName + "/type2_" + setName + jpInput.value.trim().replace("　", "").toLowerCase()), true);
+        set(ref(db, "SelfPractice/" + studentName + "/type1_" + setName + jpInput.value.trim().toLowerCase()), setInputbyJP.includes(setName) ? jpInput.value.trim().length : 1);
+        // set(ref(db, "SelfPractice/" + studentName + "/type2_" + setName + jpInput.value.trim().toLowerCase()), true);
       } else {
         jpInput.style.backgroundColor = ""
         jpInput.style.color = ""
@@ -191,7 +202,7 @@ function nextQuestionSelfPractice(nextSetName) {
         jpInput.select();
         document.getElementById('questionJPSelect').classList.add("d-none");
         document.getElementById('questionJPType').classList.remove("d-none");
-        questionRo.innerHTML = q.options[0].jp + "　　　" + setStatus;
+        questionRo.innerHTML = (setInputbyJP.includes(setName) ? q.ro : q.options[0].jp) + "　　　" + setStatus;
       }else {
         document.getElementById('questionJPSelect').classList.remove("d-none");
         document.getElementById('questionJPType').classList.add("d-none");

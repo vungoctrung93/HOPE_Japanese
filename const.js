@@ -1,0 +1,1 @@
+export const setInputbyJP = ['OLD CLASS'];
