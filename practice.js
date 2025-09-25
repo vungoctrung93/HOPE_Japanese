@@ -28,6 +28,16 @@ window.addEventListener('DOMContentLoaded', async () => {
   const response = await res.json();
   QUESTIONS = JSON.parse(response);
   nextQuestionSelfPractice();
+
+  onValue(ref(db, "clearStorage"), (snapshot) => {
+    // const data = snapshot.val();
+    const Q1Name = localStorage.getItem("Q1Name");
+    const Q2Name = localStorage.getItem("Q2Name");
+    localStorage.clear();
+    localStorage.setItem("Q1Name", Q1Name? Q1Name : "");
+    localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
+    console.log("localStorage clear");
+  });
 });
 
 
@@ -139,12 +149,12 @@ function nextQuestionSelfPractice(nextSetName) {
   const shuffled = options.map((v, i) => ({ ...v, index: i })).sort(() => Math.random() - 0.5);
   
   app.innerHTML = `
-    <div class="mt-5">
-      <a href="./" class="btn bg-warning text-white">Quay lại trang luyện tập chung</a>
-    </div>
     <div id="practice-message"></div>
-    <div class="Question">
+    <div class="Question mt-5">
       <div class="mx-auto text-center">
+        <span class="me-3">
+          <a href="./" class="btn bg-warning text-white">←</a>
+        </span>
         <label style="cursor:pointer;">
           Gõ <input type="radio" name="typeOrSelect" value="type" class="radio" ${localStorage.getItem('typeOrSelect') === "type" ? "checked" : ""}/>
         </label>
@@ -154,7 +164,7 @@ function nextQuestionSelfPractice(nextSetName) {
       </div>
       <div id="questionRo" class="text-center no-selectable">${localStorage.getItem('typeOrSelect') === "type" && !setInputbyJP.includes(setName) ? q.options[0].jp : q.ro}　　　${setStatus}</div>
       <div id="questionJPType" class="mx-auto text-center">
-        <input id="jpInput" type="text" class="w-75" autocomplete="off" placeholder="Nhập ${ setName.toLowerCase().includes("kanji") || setName.toLowerCase().includes("old class") || setName.toLowerCase().includes("bunpo1") ? "hiragana" : "romaji" } "/>
+        <input id="jpInput" type="text" class="w-75" autocomplete="off" placeholder="Nhập ${ setInputbyJP.includes(setName) ? "hiragana" : "romaji" } "/>
       </div>
       <div id="questionJPSelect">
         <div class="jp">

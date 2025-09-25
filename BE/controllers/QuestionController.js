@@ -54,25 +54,27 @@ exports.getQuestions = (req, res, next) => {
 };
 exports.getQUESTIONSData = (req, res, next) => {
 
-  const now = new Date();
-  const pad = n => n.toString().padStart(2, '0');
-  const timestamp = [
-    now.getFullYear(),
-    pad(now.getMonth() + 1),
-    pad(now.getDate()),
-    pad(now.getHours()),
-    pad(Math.floor(now.getMinutes() / 5))
-  ].join('-');
-  const rightAnswerListSize = Object.keys(rightAnswerList).map(key => {
-    let person = {};
-    person[key] = rightAnswerList[key].length;
-    return person;
-  })
-  fs.writeFileSync(`${path.resolve(path.resolve(path.resolve(__dirname, '..'), '..'), '..')}/BakupJapaneseHope/bak${timestamp}.json`, JSON.stringify(rightAnswerListSize), err => {
-    if (err) {
-      logger.error(err, { at: new Error });
-    }
-  });
+  if(rightAnswerList && Object.keys(rightAnswerList).length > 0){
+    const now = new Date();
+    const pad = n => n.toString().padStart(2, '0');
+    const timestamp = [
+      now.getFullYear(),
+      pad(now.getMonth() + 1),
+      pad(now.getDate()),
+      pad(now.getHours()),
+      pad(Math.floor(now.getMinutes() / 5))
+    ].join('-');
+    const rightAnswerListSize = Object.keys(rightAnswerList).map(key => {
+      let person = {};
+      person[key] = rightAnswerList[key].length;
+      return person;
+    })
+    fs.writeFileSync(`${path.resolve(path.resolve(path.resolve(__dirname, '..'), '..'), '..')}/BakupJapaneseHope/bak${timestamp}.json`, JSON.stringify(rightAnswerListSize), err => {
+      if (err) {
+        logger.error(err, { at: new Error });
+      }
+    });
+  }
 
   res.status(200).json(JSON.stringify(QUESTIONS));
 };
@@ -99,28 +101,30 @@ db.ref('clearStorage').set(JSON.stringify({
 
 const nextQuestions = (req, res, next) => {
 
-  const now = new Date();
-  const pad = n => n.toString().padStart(2, '0');
-  const timestamp = [
-    now.getFullYear(),
-    pad(now.getMonth() + 1),
-    pad(now.getDate()),
-    pad(now.getHours()),
-    pad(Math.floor(now.getMinutes() / 5))
-  ].join('-');
-  const rightAnswerListSize = Object.keys(rightAnswerList).map(key => {
-    let person = {};
-    person[key] = rightAnswerList[key].length;
-    return person;
-  })
-  logger.debug(`rightAnswerListSize: ${JSON.stringify(rightAnswerListSize)}`, { at: new Error });
-  // backup answered count list
-  fs.writeFileSync(`${path.resolve(path.resolve(path.resolve(__dirname, '..'), '..'), '..')}/BakupJapaneseHope/next${timestamp}.json`, JSON.stringify(rightAnswerListSize), err => {
-    if (err) {
-      logger.error(err, { at: new Error });
-    }
-  });
-
+  if(rightAnswerList && Object.keys(rightAnswerList).length > 0){
+    const now = new Date();
+    const pad = n => n.toString().padStart(2, '0');
+    const timestamp = [
+      now.getFullYear(),
+      pad(now.getMonth() + 1),
+      pad(now.getDate()),
+      pad(now.getHours()),
+      pad(Math.floor(now.getMinutes() / 5))
+    ].join('-');
+    const rightAnswerListSize = Object.keys(rightAnswerList).map(key => {
+      let person = {};
+      person[key] = rightAnswerList[key].length;
+      return person;
+    })
+    logger.debug(`rightAnswerListSize: ${JSON.stringify(rightAnswerListSize)}`, { at: new Error });
+    // backup answered count list
+    fs.writeFileSync(`${path.resolve(path.resolve(path.resolve(__dirname, '..'), '..'), '..')}/BakupJapaneseHope/next${timestamp}.json`, JSON.stringify(rightAnswerListSize), err => {
+      if (err) {
+        logger.error(err, { at: new Error });
+      }
+    });
+  }
+  
   set = req.params.set ? req.params.set : set;
   if (set === 'all') {
     set = 'GOI1';

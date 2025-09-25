@@ -105,12 +105,12 @@ function resetQuestion(set) {
 }
 
 function chartDraw(data, chartCountsBySum) {
-
-  // Prepare data for chart
-  let chartLabels = Object.keys(data);
   // Prepare chart data: count of right answers per user
-  let chartCounts = chartCountsBySum || chartLabels.map(name => data[name].length);
-  console.log(chartCounts);
+  let chartCounts = chartCountsBySum || Object.keys(data).map(name => data[name]?.length);
+  // Prepare data for chart
+  let chartLabels = Object.keys(data).map((name, index) => {
+    return name + (chartCounts[index] < 10 ? `-00${chartCounts[index]}` : chartCounts[index] < 100 ? `-0${chartCounts[index]}` : `-${chartCounts[index]}`);
+  });
   if (chart) {
     chart.destroy();
   }
@@ -118,11 +118,10 @@ function chartDraw(data, chartCountsBySum) {
   chart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: chartLabels.filter((element, index) => index < chartLabels.length)
-      ,
+      labels: chartLabels,
       datasets: [{
-        label: '',
-        data: chartCounts.filter((element, index) => index < chartCounts.length),
+        label: 'Số câu đúng',
+        data: chartCounts,
         backgroundColor: 'rgba(15, 124, 0, 0.6)'
       }]
     },
@@ -134,7 +133,7 @@ function chartDraw(data, chartCountsBySum) {
           beginAtZero: true,
           ticks: {
             font: {
-              size: getFontSize(data ? Object.keys(data).length : 1)
+              size: getFontSize(chartLabels.length)
             },
             minRotation: 90,
             maxRotation: 90,
@@ -152,7 +151,15 @@ function chartDraw(data, chartCountsBySum) {
           }
         }
       },
-      aspectRatio: 2.5
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          enabled: true
+        }
+      },
+      aspectRatio: (16/7)
     }
   });
 }
@@ -171,8 +178,6 @@ async function selfPractice() {
         let chartCount = 0;
         rightAnswerList[studentName].forEach((key) => {
           chartCount += snapshotManage.val()[studentName][key] || 0;
-          console.log(key, snapshotManage.val()[studentName][key], chartCount);
-
         });
         chartCounts.push(chartCount);
       });
