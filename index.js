@@ -170,10 +170,13 @@ function test() {
       }
 
       document.getElementById("Q1Name").onkeyup = function (event) {
-        localStorage.setItem("Q1Name", document.getElementById("Q1Name").value);
+        event.target.value = event.target.value.replace(/[.#$\[\]\/]/g, '_');
+        console.log(event.target.value);
+        localStorage.setItem("Q1Name", event.target.value);
       }
       document.getElementById("Q2Name").onkeyup = function (event) {
-        localStorage.setItem("Q2Name", document.getElementById("Q2Name").value);
+        event.target.value = event.target.value.replace(/[.#$\[\]\/]/g, '_');
+        localStorage.setItem("Q2Name", event.target.value);
       }
 
       const buttons = document.querySelectorAll("div>.jp>div,div>.vi>div");
