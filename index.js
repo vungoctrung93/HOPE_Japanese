@@ -172,10 +172,18 @@ function test() {
       document.getElementById("Q1Name").onkeyup = function (event) {
         event.target.value = event.target.value.replace(/[.#$\[\]\/]/g, '_');
         console.log(event.target.value);
+        if(event.target.value === localStorage.getItem("Q2Name") && event.target.value !== "") {
+          alert("Tên 2 người không được trùng nhau");
+          event.target.value = event.target.value + "_1";
+        }
         localStorage.setItem("Q1Name", event.target.value);
       }
       document.getElementById("Q2Name").onkeyup = function (event) {
         event.target.value = event.target.value.replace(/[.#$\[\]\/]/g, '_');
+        if(event.target.value === localStorage.getItem("Q1Name") && event.target.value !== "") {
+          alert("Tên 2 người không được trùng nhau");
+          event.target.value = event.target.value + "_2";
+        }
         localStorage.setItem("Q2Name", event.target.value);
       }
 
