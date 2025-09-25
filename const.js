@@ -1,1 +1,1 @@
-export const setInputbyJP = ['OLD CLASS'];
+export const setInputbyJP = ['KANJI1', 'BUNPO1', 'trường âm'];

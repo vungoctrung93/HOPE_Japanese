@@ -181,12 +181,6 @@ function nextQuestionSelfPractice(nextSetName) {
   // if typeOrSelect value is type, focus on jpInput
   if (jpInput) {
     jpInput.addEventListener('keyup', async function () {
-
-      console.log(jpInput.value.trim().toLowerCase() === q.ro.toLowerCase() && !setInputbyJP.includes(setName));
-      console.log(jpInput.value.trim().toLowerCase(), q.ro.toLowerCase(), setName);
-      console.log(jpInput.value.trim() === q.options[0].jp && setInputbyJP.includes(setName));
-      
-      
       if ((jpInput.value.trim().toLowerCase() === q.ro.toLowerCase() && !setInputbyJP.includes(setName)) || (jpInput.value.trim() === q.options[0].jp && setInputbyJP.includes(setName))){
         correctTypeAnswer = true;
         jpInput.style.backgroundColor = "green"
@@ -235,7 +229,7 @@ function nextQuestionSelfPractice(nextSetName) {
         const msg = document.getElementById('practice-message');
         if (correctQuizAnswer) {
           e.target.style.backgroundColor = 'green';
-          if(correctTypeAnswer) {
+          if(correctTypeAnswer && !answerChecked) {
             // student Name
             const studentName = localStorage.getItem("Q1Name") ? localStorage.getItem("Q1Name") : 'Người chơi 1' + Math.floor(Math.random() * 1000000);
             setFirebaseValue("SelfPractice/" + studentName + "/type1_" + setName + jpInput.value.trim().toLowerCase(), setInputbyJP.includes(setName) ? jpInput.value.trim().length : 1);
