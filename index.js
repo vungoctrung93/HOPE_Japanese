@@ -49,14 +49,18 @@ window.addEventListener('DOMContentLoaded', async () => {
     test();
   });
 
+  // listen to clearStorage value change
   onValue(ref(db, "clearStorage"), (snapshot) => {
-    // const data = snapshot.val();
-    const Q1Name = localStorage.getItem("Q1Name");
-    const Q2Name = localStorage.getItem("Q2Name");
-    localStorage.clear();
-    localStorage.setItem("Q1Name", Q1Name? Q1Name : "");
-    localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
-    console.log("localStorage clear");
+    if(localStorage.getItem("clearStorage") !== snapshot.val().timestamp) {
+      // const data = snapshot.val();
+      const Q1Name = localStorage.getItem("Q1Name");
+      const Q2Name = localStorage.getItem("Q2Name");
+      localStorage.clear();
+      localStorage.setItem("Q1Name", Q1Name? Q1Name : "");
+      localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
+      console.log("localStorage clear");
+      localStorage.setItem("clearStorage", snapshot.val().timestamp);
+    }
   });
   
   

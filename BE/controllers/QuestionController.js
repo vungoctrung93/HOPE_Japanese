@@ -54,7 +54,7 @@ exports.getQuestions = (req, res, next) => {
 };
 exports.getQUESTIONSData = (req, res, next) => {
 
-  if(rightAnswerList && Object.keys(rightAnswerList).length > 0){
+  if(rightAnswerList && Object.keys(rightAnswerList).length > 0 ){
     const now = new Date();
     const pad = n => n.toString().padStart(2, '0');
     const timestamp = [
@@ -97,6 +97,37 @@ const db = getFirebaseDB();
 db.ref('clearStorage').set(JSON.stringify({
   timestamp: new Date().toISOString()
 }));
+db.ref('SelfPractice').on('value', (snapshot) => {
+    if (snapshot.exists()) {
+      const val = snapshot.val();
+      if(val){
+        const now = new Date();
+        const pad = n => n.toString().padStart(2, '0');
+        const timestamp = [
+          now.getFullYear(),
+          pad(now.getMonth() + 1),
+          pad(now.getDate()),
+          pad(now.getHours()),
+          pad(Math.floor(now.getMinutes() / 5))
+        ].join('-');
+        console.log(Object.keys(val));
+        
+        const rightAnswerListSize = Object.keys(val).map(key => {
+          let person = {};
+          person[key] = Object.keys(val[key]).length;
+          return person;
+        })
+        logger.debug(`rightAnswerListSize: ${JSON.stringify(rightAnswerListSize)}`, { at: new Error });
+        // backup answered count list
+        fs.writeFileSync(`${path.resolve(path.resolve(path.resolve(__dirname, '..'), '..'), '..')}/BakupJapaneseHope/self${timestamp}.json`, JSON.stringify(rightAnswerListSize), err => {
+          if (err) {
+            logger.error(err, { at: new Error });
+          }
+        });
+      }
+    }
+  }
+);
 
 
 const nextQuestions = (req, res, next) => {
@@ -226,8 +257,6 @@ const resetQuestions = async (req, res, next) => {
   set = req.params.set ? req.params.set : set;
   
   db.ref('clearStorage').set(JSON.stringify({
-    notTestedQuestion1,
-    rightAnswerList,
     timestamp: new Date().toISOString()
   }));
   if (set === 'all') {

@@ -29,14 +29,32 @@ window.addEventListener('DOMContentLoaded', async () => {
   QUESTIONS = JSON.parse(response);
   nextQuestionSelfPractice();
 
+  const { initializeApp } = await import('./lib/firebase-app.js');
+  const { getDatabase, ref, once, get, set, update, onValue, connectDatabaseEmulator } = await import('./lib/firebase-database.js');
+  const firebaseConfig = {
+    databaseURL: window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":9000/?ns=hopejapaneseshiken"
+  };
+  if (!firebaseApp) {
+    firebaseApp = initializeApp(firebaseConfig);
+    db = getDatabase(firebaseApp);
+    connectDatabaseEmulator(db, window.location.href.split(":")[1], 9000);
+  }
+  // listen to clearStorage value change
   onValue(ref(db, "clearStorage"), (snapshot) => {
-    // const data = snapshot.val();
-    const Q1Name = localStorage.getItem("Q1Name");
-    const Q2Name = localStorage.getItem("Q2Name");
-    localStorage.clear();
-    localStorage.setItem("Q1Name", Q1Name? Q1Name : "");
-    localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
-    console.log("localStorage clear");
+    const { timestamp } = JSON.parse(snapshot.val());
+    console.log("clearStorage changed", timestamp);
+    console.log("localStorage", localStorage.getItem("clearStorage"));
+    
+    if(localStorage.getItem("clearStorage") !== timestamp) {
+      // const data = snapshot.val();
+      const Q1Name = localStorage.getItem("Q1Name");
+      const Q2Name = localStorage.getItem("Q2Name");
+      localStorage.clear();
+      localStorage.setItem("Q1Name", Q1Name? Q1Name : "");
+      localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
+      console.log("localStorage clear");
+      localStorage.setItem("clearStorage", timestamp);
+    }
   });
 });
 
@@ -153,7 +171,7 @@ function nextQuestionSelfPractice(nextSetName) {
     <div class="Question mt-5">
       <div class="mx-auto text-center">
         <span class="me-3">
-          <a href="./" class="btn bg-warning text-white">←</a>
+          <a href="./" class="btn bg-warning text-white decoration-none">←</a>
         </span>
         <label style="cursor:pointer;">
           Gõ <input type="radio" name="typeOrSelect" value="type" class="radio" ${localStorage.getItem('typeOrSelect') === "type" ? "checked" : ""}/>
@@ -198,7 +216,7 @@ function nextQuestionSelfPractice(nextSetName) {
         if((correctQuizAnswer || q.options[0].vi === undefined || q.options[0].vi === '') && !answerChecked) {
           // student Name
           const studentName = localStorage.getItem("Q1Name") ? localStorage.getItem("Q1Name") : 'Người chơi 1' + Math.floor(Math.random() * 1000000);
-          setFirebaseValue("SelfPractice/" + studentName + "/type1_" + setName + jpInput.value.trim().toLowerCase(), setInputbyJP.includes(setName) ? jpInput.value.trim().length : 1);
+          setFirebaseValue("SelfPractice/" + studentName + "/type_" + setName + "_" + jpInput.value.trim().toLowerCase(), setInputbyJP.includes(setName) ? jpInput.value.trim().length : 1);
         }
       } else {
         jpInput.style.backgroundColor = ""
@@ -242,7 +260,7 @@ function nextQuestionSelfPractice(nextSetName) {
           if(correctTypeAnswer && !answerChecked) {
             // student Name
             const studentName = localStorage.getItem("Q1Name") ? localStorage.getItem("Q1Name") : 'Người chơi 1' + Math.floor(Math.random() * 1000000);
-            setFirebaseValue("SelfPractice/" + studentName + "/type1_" + setName + jpInput.value.trim().toLowerCase(), setInputbyJP.includes(setName) ? jpInput.value.trim().length : 1);
+            setFirebaseValue("SelfPractice/" + studentName + "/type_" + setName + "_" + jpInput.value.trim().toLowerCase(), setInputbyJP.includes(setName) ? jpInput.value.trim().length : 1);
           }
         } else {
           e.target.style.backgroundColor = 'red';

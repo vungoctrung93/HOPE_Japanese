@@ -142,6 +142,9 @@ body {
 .w-75 {
   width: 75%;
 }
+.decoration-none {
+  text-decoration: none;
+}
 .no-selectable {
   -webkit-user-select: none; /* Safari */
   -moz-user-select: none; /* Firefox */
