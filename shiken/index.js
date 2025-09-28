@@ -32,8 +32,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
 
-  const { initializeApp } = await import('./lib/firebase-app.js');
-  const { getDatabase, ref, get, set, update, onValue, connectDatabaseEmulator } = await import('./lib/firebase-database.js');
+  const { initializeApp } = await import('../lib/firebase-app.js');
+  const { getDatabase, ref, get, set, update, onValue, connectDatabaseEmulator } = await import('../lib/firebase-database.js');
   const firebaseConfig = {
     databaseURL: window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":9000/?ns=hopejapaneseshiken"
   };
