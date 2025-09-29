@@ -1,4 +1,8 @@
 
+const localhost = window.location.href.includes("localhost") || window.location.href.includes("mb-pro.local");
+if(!localhost) {
+  window.location.href = './practice.html';
+}
 Array.prototype.random = function (ignore) {
   let randomIndex = Math.floor(Math.random() * this.length);
   while (ignore && ignore.length > 0 && ignore.includes(randomIndex)) {
@@ -32,8 +36,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
 
-  const { initializeApp } = await import('../lib/firebase-app.js');
-  const { getDatabase, ref, get, set, update, onValue, connectDatabaseEmulator } = await import('../lib/firebase-database.js');
+  const { initializeApp } = await import('./lib/firebase-app.js');
+  const { getDatabase, ref, get, set, update, onValue, connectDatabaseEmulator } = await import('./lib/firebase-database.js');
   const firebaseConfig = {
     databaseURL: window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":9000/?ns=hopejapaneseshiken"
   };

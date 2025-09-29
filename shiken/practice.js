@@ -5,7 +5,7 @@
 const numberOfQuestionInRange = 5;
 
 
-const HOST_URL = window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":8080";
+// const HOST_URL = window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":8080";
 
 let setName;
 let setInputbyJP;
@@ -13,34 +13,67 @@ let QUESTIONS = {};
 let correctQuizAnswer = false;
 let correctTypeAnswer = false;
 let answerChecked = false;
+let firebaseApp;
+let db;
+let getDatabase, ref, once, get, set, update, onValue, connectDatabaseEmulator;
 let notTestedQuestion1SelfPractice = localStorage.getItem("notTestedQuestion1SelfPractice") ? JSON.parse(localStorage.getItem("notTestedQuestion1SelfPractice")) : {};
 
+const localhost = window.location.href.includes("localhost") || window.location.href.includes("mb-pro.local");
+
+
 window.addEventListener('DOMContentLoaded', async () => {
-
-  setInputbyJP = (await import('./const.js')).setInputbyJP;
-
-  const res = await fetch(HOST_URL + "/questionsData", {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
-  const response = await res.json();
-  QUESTIONS = JSON.parse(response);
-  nextQuestionSelfPractice();
-
-  const { initializeApp } = await import('../lib/firebase-app.js');
-  const { getDatabase, ref, once, get, set, update, onValue, connectDatabaseEmulator } = await import('../lib/firebase-database.js');
+  
+  ({ setInputbyJP } = await import('./const.js'));
+  
+  const { initializeApp } = await import('./lib/firebase-app.js');
+  ({ getDatabase, ref, once, get, set, update, onValue, connectDatabaseEmulator } = await import('./lib/firebase-database.js'));
+  let databaseURL;
+  if(localhost) {
+    databaseURL = window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":9000/?ns=hopejapaneseshiken"
+  } else {
+    databaseURL = "https://hopejapaneseshiken-default-rtdb.asia-southeast1.firebasedatabase.app"
+  }
   const firebaseConfig = {
-    databaseURL: window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":9000/?ns=hopejapaneseshiken"
+    apiKey: "AIzaSyBWe_u9D9dVxtbawXnQcEnPVbrloO0DR8A",
+    authDomain: "hopejapaneseshiken.firebaseapp.com",
+    databaseURL,
+    projectId: "hopejapaneseshiken",
+    storageBucket: "hopejapaneseshiken.firebasestorage.app",
+    messagingSenderId: "319879010332",
+    appId: "1:319879010332:web:7cea0395b1e3597098e7d9"
   };
   if (!firebaseApp) {
     firebaseApp = initializeApp(firebaseConfig);
     db = getDatabase(firebaseApp);
-    connectDatabaseEmulator(db, window.location.href.split(":")[1], 9000);
+
+    if(localhost) {
+      connectDatabaseEmulator(db, window.location.href.split(":")[1], 9000);
+    }
   }
   // listen to clearStorage value change
+  onValue(ref(db, "QUESTIONS"), async (snapshot) => {
+    if(!snapshot.val()) {
+      alert("No QUESTIONS data in firebase");
+      // const res = await fetch("http://localhost:8080/questionsData", {
+      //   method: 'GET',
+      //   headers: {
+      //     'Content-Type': 'application/json'
+      //   }
+      // });
+      // const response = await res.json();
+      // QUESTIONS = JSON.parse(response);
+      // set(ref(db, "QUESTIONS"), QUESTIONS);
+      // console.log("Fetch QUESTIONS from localhost:8080", QUESTIONS);
+    } else {
+      QUESTIONS = snapshot.val();
+      nextQuestionSelfPractice();
+    }
+  });
+
+
+  // listen to clearStorage value change
   onValue(ref(db, "clearStorage"), (snapshot) => {
+    if(!snapshot.val()) return;
     const { timestamp } = JSON.parse(snapshot.val());
     console.log("clearStorage changed", timestamp);
     console.log("localStorage", localStorage.getItem("clearStorage"));
@@ -123,23 +156,8 @@ const nextQuestionSelfPractices = (set ) => {
   };
   return { q1: q1SelftPractice };
 };
-let firebaseApp;
-let db;
 
 async function setFirebaseValue(path, value) {
-  console.log(path, value);
-  
-  // when type correct answer, save to firebase
-  const { initializeApp } = await import('../lib/firebase-app.js');
-  const { getDatabase, ref, get, set, update, onValue, connectDatabaseEmulator } = await import('../lib/firebase-database.js');
-  const firebaseConfig = {
-    databaseURL: window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":9000/?ns=hopejapaneseshiken"
-  };
-  if(!firebaseApp) {
-    firebaseApp = await initializeApp(firebaseConfig);
-    db = getDatabase(firebaseApp);
-    connectDatabaseEmulator(db, window.location.href.split(":")[1], 9000);
-  }
   set(ref(db, path), value);
   // set(ref(db, "SelfPractice/" + studentName + "/type2_" + setName + jpInput.value.trim().toLowerCase()), true);
 }
@@ -150,8 +168,7 @@ function nextQuestionSelfPractice(nextSetName) {
   correctTypeAnswer = false;
   answerChecked = false;
   if (!localStorage.getItem("Q1Name") || localStorage.getItem("Q1Name") === '') {
-    alert("Hãy quay lại trang trước và điền tên của cả 2 người");
-    document.location = "./";
+    localStorage.setItem("Q1Name", prompt("Hãy điền tên của bạn:"));
   }
   setName = typeof nextSetName === 'string' ? nextSetName : 'HIRAGANA';
   // console.log(setName);

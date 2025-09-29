@@ -1,4 +1,5 @@
 
+const localhost = window.location.href.includes("localhost") || window.location.href.includes("mb-pro.local");
 Array.prototype.random = function (ignore) {
   let randomIndex = Math.floor(Math.random() * this.length);
   while (this[randomIndex] === ignore) {
@@ -22,36 +23,61 @@ let chart; // Global chart variable
 let db;
 let firebaseApp;
 let isSelfPractice;
+let getDatabase, ref, once, get, set, update, onValue, connectDatabaseEmulator;
 document.addEventListener("DOMContentLoaded", async function () {
 
-  const res = await fetch(HOST_URL + "/questionsData", {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
-  const response = await res.json();
-  QUESTIONS = JSON.parse(response);
-
+  // const res = await fetch(HOST_URL + "/questionsData", {
+  //   method: 'GET',
+  //   headers: {
+  //     'Content-Type': 'application/json'
+  //   }
+  // });
+  // const response = await res.json();
+  // QUESTIONS = JSON.parse(response);
+  // try {
+  //   await import('../lib/chart.js');    
+  // } catch (ex) {
+  //   console.error(ex);
+  // }
   const { initializeApp } = await import('../lib/firebase-app.js');
-  const { getDatabase, ref, once, get, set, update, onValue, connectDatabaseEmulator } = await import('../lib/firebase-database.js');
+  ( {getDatabase, ref, get, set, update, onValue, connectDatabaseEmulator } = await import('../lib/firebase-database.js'));
+  let databaseURL;
+  if(localhost) {
+    databaseURL = window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":9000/?ns=hopejapaneseshiken"
+  } else {
+    databaseURL = "https://hopejapaneseshiken-default-rtdb.asia-southeast1.firebasedatabase.app"
+  }
   const firebaseConfig = {
-    databaseURL: window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":9000/?ns=hopejapaneseshiken"
+    apiKey: "AIzaSyBWe_u9D9dVxtbawXnQcEnPVbrloO0DR8A",
+    authDomain: "hopejapaneseshiken.firebaseapp.com",
+    databaseURL,
+    projectId: "hopejapaneseshiken",
+    storageBucket: "hopejapaneseshiken.firebasestorage.app",
+    messagingSenderId: "319879010332",
+    appId: "1:319879010332:web:7cea0395b1e3597098e7d9"
   };
   if (!firebaseApp) {
     firebaseApp = initializeApp(firebaseConfig);
     db = getDatabase(firebaseApp);
-    connectDatabaseEmulator(db, window.location.href.split(":")[1], 9000);
+    if(localhost) {
+      connectDatabaseEmulator(db, window.location.href.split(":")[1], 9000);
+    }
   }
+    // listen to clearStorage value change
+  onValue(ref(db, "QUESTIONS"), async (snapshot) => {
+    if(snapshot.exists()) {
+      QUESTIONS = snapshot.val()
+    }
+  });
   onValue(ref(db, "manage"), (snapshotManage) => {
     if (snapshotManage.exists()) {
       let { notTestedQuestion1, rightAnswerList } = snapshotManage.val();
-
+      
       document.getElementById("ContentButton").innerHTML = `
-            ${Object.keys(QUESTIONS).map((key) => {
+         ${localhost && Object.keys(QUESTIONS).map((key) => {
         return ` <button onclick="nextQuestion('${key}')" class="w-25">${key} ${(QUESTIONS[key] && QUESTIONS[key].length) - ((notTestedQuestion1[key] && notTestedQuestion1[key].length) || 0)}/${QUESTIONS[key] && QUESTIONS[key].length}</button><button onclick="resetQuestion('${key}')">&#x21bb;</button>`;
       }).join('')}
-      <button onclick="selfPractice()" class="w-25">Tự luyện tập</button><button onclick="resetSelfPractice()">&#x21bb;</button>`;
+      `;
 
       if (!rightAnswerList) {
         return;
@@ -105,8 +131,10 @@ function resetQuestion(set) {
 }
 
 function chartDraw(data, chartCountsBySum) {
+
+  
   // Prepare chart data: count of right answers per user
-  let chartCounts = chartCountsBySum || Object.keys(data).map(name => data[name]?.length);
+  let chartCounts = chartCountsBySum || Object.keys(data).map(name => data[name].length);
   // Prepare data for chart
   let chartLabels = Object.keys(data).map((name, index) => {
     return name + (chartCounts[index] < 10 ? `-00${chartCounts[index]}` : chartCounts[index] < 100 ? `-0${chartCounts[index]}` : `-${chartCounts[index]}`);
@@ -114,7 +142,19 @@ function chartDraw(data, chartCountsBySum) {
   if (chart) {
     chart.destroy();
   }
+  console.log();
   const ctx = document.getElementById('top3Chart').getContext('2d');
+
+  // Get the Q1Name from localStorage
+  const q1Name = localStorage.getItem('Q1Name');
+
+  // Set background colors: orange if label matches q1Name, else default green
+  const backgroundColors = chartLabels.map(label => {
+    // Remove the "-00x" suffix to compare only the name part
+    const name = label.split('-')[0];
+    return name === q1Name ? 'orange' : 'rgba(15, 124, 0, 0.6)';
+  });
+
   chart = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -122,7 +162,7 @@ function chartDraw(data, chartCountsBySum) {
       datasets: [{
         label: 'Số câu đúng',
         data: chartCounts,
-        backgroundColor: 'rgba(15, 124, 0, 0.6)'
+        backgroundColor: backgroundColors
       }]
     },
     options: {
@@ -133,7 +173,7 @@ function chartDraw(data, chartCountsBySum) {
           beginAtZero: true,
           ticks: {
             font: {
-              size: getFontSize(chartLabels.length)
+              size: getFontSize(chartLabels.length),
             },
             minRotation: 90,
             maxRotation: 90,
@@ -166,7 +206,6 @@ function chartDraw(data, chartCountsBySum) {
 
 async function selfPractice() {
   isSelfPractice = true;
-  const { getDatabase, ref, once, get, set, update, onValue, connectDatabaseEmulator } = await import('../lib/firebase-database.js');
   onValue(ref(db, "SelfPractice"), (snapshotManage) => {
     if (snapshotManage.exists() && isSelfPractice) {
       console.log("SelfPractice", snapshotManage.val());
@@ -201,8 +240,10 @@ async function selfPractice() {
 }
 
 async function resetSelfPractice() {
-
-  const { getDatabase, ref, once, get, set, update, onValue, connectDatabaseEmulator } = await import('../lib/firebase-database.js');
+  if(!localhost && prompt("enter admin password to reset all data:") !== 'ádkjfhalsjdfhal') {
+    alert("wrong password!");
+    return;
+  }
 
   onValue(ref(db, "SelfPractice"), async (snapshotManage) => {
     if (snapshotManage.exists() && isSelfPractice) {

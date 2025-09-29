@@ -1,0 +1,58 @@
+<html>
+
+<head>
+  <title>Top 3 Chart</title>
+  <link type="image/x-icon" href="https://st.truonghyvong.edu.vn/v9/images/favicon.png" rel="shortcut icon">
+  <style>
+    .fixed {
+      position: fixed;
+      top: 0;
+      background-color: white;
+      padding: 2.6vh;
+      width: 100%;
+    }
+
+    .pt-5 {
+      padding-top: 3vh;
+    }
+
+    .pb-5 {
+      padding-bottom: 3vh;
+    }
+
+    .mt-5 {
+      margin-top: 5.1vh;
+    }
+
+    .me-1 {
+      margin-right: 1vw;
+    }
+
+    .w-25 {
+      width: 140px;
+    }
+    .d-flex {
+      display: inline;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="buttonGroup">
+    <div id="ContentButton" class="d-flex"></div>
+    <div id="SelfPracticeButton" class="d-flex">
+      <button onclick="selfPractice()" class="w-25">Tự luyện tập</button>
+      <button onclick="resetSelfPractice()">&#x21bb;</button>
+    </div>
+    <button onclick="resetQuestion('all')" class="w-25">&#x21bb; All</button>
+    <div>
+      <div id="q1" class="d-flex"></div>
+      <div id="q2" class="d-flex"></div>
+    </div>
+  </div>
+  <canvas id="top3Chart" class=""></canvas>
+  <script src="./../lib/chart-2.9.4.js"></script>
+  <script src="manage.js"></script>
+</body>
+
+</html>
