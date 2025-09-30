@@ -1,5 +1,17 @@
 
 const localhost = window.location.href.includes("localhost") || window.location.href.includes("mb-pro.local");
+let admin = false;
+const password = localStorage.getItem('adminPassword') || prompt("enter admin password to reset all data:");
+if(password !== 'ádkjfhalsjdfhal') {
+  if(password != undefined && password !== '' && password !== 'null' &&password !== 'asdfasdcasdfasf') {
+    alert("wrong password!" + password);
+  } else {
+    localStorage.setItem('adminPassword', 'asdfasdcasdfasf');
+  }
+} else {
+  admin = true;
+  localStorage.setItem('adminPassword', password);
+}
 Array.prototype.random = function (ignore) {
   let randomIndex = Math.floor(Math.random() * this.length);
   while (this[randomIndex] === ignore) {
@@ -63,36 +75,45 @@ document.addEventListener("DOMContentLoaded", async function () {
       connectDatabaseEmulator(db, window.location.href.split(":")[1], 9000);
     }
   }
-    // listen to clearStorage value change
   onValue(ref(db, "QUESTIONS"), async (snapshot) => {
     if(snapshot.exists()) {
       QUESTIONS = snapshot.val()
     }
   });
-  onValue(ref(db, "manage"), (snapshotManage) => {
-    if (snapshotManage.exists()) {
-      let { notTestedQuestion1, rightAnswerList } = snapshotManage.val();
-      
-      document.getElementById("ContentButton").innerHTML = `
-         ${localhost && Object.keys(QUESTIONS).map((key) => {
-        return ` <button onclick="nextQuestion('${key}')" class="w-25">${key} ${(QUESTIONS[key] && QUESTIONS[key].length) - ((notTestedQuestion1[key] && notTestedQuestion1[key].length) || 0)}/${QUESTIONS[key] && QUESTIONS[key].length}</button><button onclick="resetQuestion('${key}')">&#x21bb;</button>`;
-      }).join('')}
-      `;
+  document.getElementById("loading").innerHTML = `
+    <div style='background-color: #fff; position: fixed; top:15vh; width:100%; height: 90vh; text-align: center; '><div style='position:fixed; transform: translate(35vw, 40vh); font-size:5vh;'>Loading...</div></div>
+    `
+  if(admin && localhost) {
+    document.getElementById('resetall').innerHTML = `<button onclick="resetSelfPractice()">&#x21bb;</button>
+    <button onclick="resetQuestion('all')" class="w-25">&#x21bb; All</button>`;
+    onValue(ref(db, "manage"), (snapshotManage) => {
+      if (snapshotManage.exists()) {
+        let { notTestedQuestion1, rightAnswerList } = snapshotManage.val();
+        
+        document.getElementById("ContentButton").innerHTML = `
+          ${Object.keys(QUESTIONS).map((key) => {
+          return ` <button onclick="nextQuestion('${key}')" class="w-25">${key} ${(QUESTIONS[key] && QUESTIONS[key].length) - ((notTestedQuestion1[key] && notTestedQuestion1[key].length) || 0)}/${QUESTIONS[key] && QUESTIONS[key].length}</button><button onclick="resetQuestion('${key}')">&#x21bb;</button>`;
+        }).join('')}
+        `;
 
-      if (!rightAnswerList) {
-        return;
-      };
-      rightAnswerList = sortByValueLength(rightAnswerList);
-      chartDraw(rightAnswerList);
-    }
-  });
-  onValue(ref(db, "questions"), (snapshot) => {
-    if (snapshot.exists() && !isSelfPractice) {
-      const { q1, q2 } = snapshot.val();
-      document.getElementById("q1").innerHTML = `Q1: ${((q1 && q1.options && q1.ro) || '')}`// - ${((q1 && q1.options && q1.options[0] && q1.options[0].vi) || '')}`;
-      document.getElementById("q2").innerHTML = `Q2: ${((q2 && q2.options && q2.ro) || '')}`// - ${((q2 && q2.options && q2.options[0] && q2.options[0].vi) || '')}`;
-    }
-  });
+        if (!rightAnswerList) {
+          return;
+        };
+        rightAnswerList = sortByValueLength(rightAnswerList);
+        chartDraw(rightAnswerList);
+      }
+    });
+    onValue(ref(db, "questions"), (snapshot) => {
+      if (snapshot.exists() && !isSelfPractice) {
+        const { q1, q2 } = snapshot.val();
+        document.getElementById("q1").innerHTML = `Q1: ${((q1 && q1.options && q1.ro) || '')}`// - ${((q1 && q1.options && q1.options[0] && q1.options[0].vi) || '')}`;
+        document.getElementById("q2").innerHTML = `Q2: ${((q2 && q2.options && q2.ro) || '')}`// - ${((q2 && q2.options && q2.options[0] && q2.options[0].vi) || '')}`;
+      }
+    });
+  } else {
+    document.getElementById("SelfPracticeButton").style.display = "none"
+    selfPractice();
+  }
 
 });
 
@@ -142,7 +163,6 @@ function chartDraw(data, chartCountsBySum) {
   if (chart) {
     chart.destroy();
   }
-  console.log();
   const ctx = document.getElementById('top3Chart').getContext('2d');
 
   // Get the Q1Name from localStorage
@@ -202,6 +222,8 @@ function chartDraw(data, chartCountsBySum) {
       aspectRatio: (16/7)
     }
   });
+
+  document.getElementById("loading").innerHTML = '';
 }
 
 async function selfPractice() {
@@ -240,21 +262,12 @@ async function selfPractice() {
 }
 
 async function resetSelfPractice() {
-  if(!localhost && prompt("enter admin password to reset all data:") !== 'ádkjfhalsjdfhal') {
-    alert("wrong password!");
-    return;
-  }
-
-  onValue(ref(db, "SelfPractice"), async (snapshotManage) => {
-    if (snapshotManage.exists() && isSelfPractice) {
-      const res = await fetch(HOST_URL + "/questionsData", {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      const response = await res.json();
-      set(ref(db, "SelfPractice/"), {});
+  const res = await fetch(HOST_URL + "/backupfirebase", {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
     }
   });
+  const response = await res.json();
+  await set(ref(db, "SelfPractice/"), {});
 }

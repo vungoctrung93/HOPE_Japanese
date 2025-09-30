@@ -12,11 +12,6 @@ Array.prototype.random = function (ignore) {
 }
 const HOST_URL = window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":8080";
 
-document.addEventListener('scroll', (e) => {
-    if (scrollLock && document.documentElement.scrollTop > 100) {
-        document.documentElement.scrollTop = 100;
-    }
-});
 
 window.addEventListener('DOMContentLoaded', async () => {
 
@@ -59,9 +54,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       // const data = snapshot.val();
       const Q1Name = localStorage.getItem("Q1Name");
       const Q2Name = localStorage.getItem("Q2Name");
+      const adminPassword = localStorage.getItem("adminPassword");
       localStorage.clear();
       localStorage.setItem("Q1Name", Q1Name? Q1Name : "");
       localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
+      localStorage.setItem("adminPassword", adminPassword? adminPassword : "");
       console.log("localStorage clear");
       localStorage.setItem("clearStorage", snapshot.val().timestamp);
     }
@@ -224,7 +221,9 @@ function test() {
           const Q2Name = localStorage.getItem("Q2Name");
           const savedAnswerId = buttonId.substr(2, 2) === 'Vi' ? 'Jp' : 'Vi';
           const savedAnswer = localStorage.getItem(questionRo + buttonId.substr(0, 2) + savedAnswerId);
+          const adminPassword = localStorage.getItem("adminPassword");
           localStorage.clear();
+          localStorage.setItem("adminPassword", adminPassword? adminPassword : "");
           localStorage.setItem("Q1Name", Q1Name? Q1Name : "");
           localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
           localStorage.setItem(questionRo + buttonId.substr(0, 4), e.target.innerText);

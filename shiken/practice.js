@@ -82,9 +82,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       // const data = snapshot.val();
       const Q1Name = localStorage.getItem("Q1Name");
       const Q2Name = localStorage.getItem("Q2Name");
+      const adminPassword = localStorage.getItem("adminPassword");
       localStorage.clear();
       localStorage.setItem("Q1Name", Q1Name? Q1Name : "");
       localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
+      localStorage.setItem("adminPassword", adminPassword? adminPassword : "");
       console.log("localStorage clear");
       localStorage.setItem("clearStorage", timestamp);
     }
@@ -189,6 +191,9 @@ function nextQuestionSelfPractice(nextSetName) {
       <div class="mx-auto text-center">
         <span class="me-3">
           <a href="./" class="btn bg-warning text-white decoration-none">←</a>
+        </span>
+        <span class="me-3">
+          <a href="./manage" class="btn bg-warning text-white decoration-none">&#x1F4CA;</a>
         </span>
         <label style="cursor:pointer;">
           Gõ <input type="radio" name="typeOrSelect" value="type" class="radio" ${localStorage.getItem('typeOrSelect') === "type" ? "checked" : ""}/>
