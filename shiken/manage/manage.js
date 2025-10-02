@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById('resetall').innerHTML = `<button onclick="resetSelfPractice()">&#x21bb;</button>
     <button onclick="resetQuestion('all')" class="w-25">&#x21bb; All</button>`;
     onValue(ref(db, "manage"), (snapshotManage) => {
-      if (snapshotManage.exists()) {
+      if (snapshotManage.exists() && !isSelfPractice) {
         let { notTestedQuestion1, rightAnswerList } = snapshotManage.val();
         
         document.getElementById("ContentButton").innerHTML = `

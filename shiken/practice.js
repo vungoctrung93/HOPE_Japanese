@@ -83,10 +83,12 @@ window.addEventListener('DOMContentLoaded', async () => {
       const Q1Name = localStorage.getItem("Q1Name");
       const Q2Name = localStorage.getItem("Q2Name");
       const adminPassword = localStorage.getItem("adminPassword");
+      const typeOrSelect = localStorage.getItem('typeOrSelect');
       localStorage.clear();
       localStorage.setItem("Q1Name", Q1Name? Q1Name : "");
       localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
       localStorage.setItem("adminPassword", adminPassword? adminPassword : "");
+      localStorage.setItem("typeOrSelect", typeOrSelect? typeOrSelect : "");
       console.log("localStorage clear");
       localStorage.setItem("clearStorage", timestamp);
     }

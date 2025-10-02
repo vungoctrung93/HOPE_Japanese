@@ -55,9 +55,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       const Q1Name = localStorage.getItem("Q1Name");
       const Q2Name = localStorage.getItem("Q2Name");
       const adminPassword = localStorage.getItem("adminPassword");
+      const typeOrSelect = localStorage.getItem('typeOrSelect');
       localStorage.clear();
       localStorage.setItem("Q1Name", Q1Name? Q1Name : "");
       localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
+      localStorage.setItem("typeOrSelect", typeOrSelect? typeOrSelect : "");
       localStorage.setItem("adminPassword", adminPassword? adminPassword : "");
       console.log("localStorage clear");
       localStorage.setItem("clearStorage", snapshot.val().timestamp);
@@ -222,8 +224,10 @@ function test() {
           const savedAnswerId = buttonId.substr(2, 2) === 'Vi' ? 'Jp' : 'Vi';
           const savedAnswer = localStorage.getItem(questionRo + buttonId.substr(0, 2) + savedAnswerId);
           const adminPassword = localStorage.getItem("adminPassword");
+          const typeOrSelect = localStorage.getItem('typeOrSelect');
           localStorage.clear();
           localStorage.setItem("adminPassword", adminPassword? adminPassword : "");
+          localStorage.setItem("typeOrSelect", typeOrSelect? typeOrSelect : "");
           localStorage.setItem("Q1Name", Q1Name? Q1Name : "");
           localStorage.setItem("Q2Name", Q2Name? Q2Name : "");
           localStorage.setItem(questionRo + buttonId.substr(0, 4), e.target.innerText);
