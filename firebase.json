@@ -1,12 +1,24 @@
 {
-  "hosting": {
-    "public": "shiken",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
-  },
+  "hosting": [
+    {
+      "site": "hopejpshiken",
+      "public": "shiken",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
+    },
+    {
+      "site": "hopejapaneseshiken",
+      "public": "shiken",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
+    }
+  ],
   "emulators": {
     "database": {
       "port": 9000,
