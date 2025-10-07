@@ -18,7 +18,7 @@ let db;
 let getDatabase, ref, once, get, set, update, onValue, connectDatabaseEmulator;
 let notTestedQuestion1SelfPractice = localStorage.getItem("notTestedQuestion1SelfPractice") ? JSON.parse(localStorage.getItem("notTestedQuestion1SelfPractice")) : {};
 
-const localhost = window.location.href.includes("localhost") || window.location.href.includes("mb-pro.local");
+const localhost = window.location.href.includes("localhost") || window.location.href.includes("mb-pro.local") || window.location.href.includes("mb-air.local");
 
 
 window.addEventListener('DOMContentLoaded', async () => {

@@ -1,5 +1,5 @@
 
-const localhost = window.location.href.includes("localhost") || window.location.href.includes("mb-pro.local");
+const localhost = window.location.href.includes("localhost") || window.location.href.includes("mb-pro.local") || window.location.href.includes("mb-air.local");
 let admin = false;
 const password = localStorage.getItem('adminPassword') || prompt("enter admin password to reset all data:");
 if(password !== 'ádkjfhalsjdfhal') {
