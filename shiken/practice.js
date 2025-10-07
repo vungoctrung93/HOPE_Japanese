@@ -8,7 +8,7 @@ const numberOfQuestionInRange = 5;
 // const HOST_URL = window.location.href.split(":")[0] + ":" + window.location.href.split(":")[1] + ":8080";
 
 let setName;
-let setInputbyJP;
+let setInputHalfPoint;
 let QUESTIONS = {};
 let correctQuizAnswer = false;
 let correctTypeAnswer = false;
@@ -24,6 +24,7 @@ const localhost = window.location.href.includes("localhost") || window.location.
 window.addEventListener('DOMContentLoaded', async () => {
   
   ({ setInputbyJP } = await import('./const.js'));
+  ({ setInputHalfPoint } = await import('./const.js'));
   
   const { initializeApp } = await import('./lib/firebase-app.js');
   ({ getDatabase, ref, once, get, set, update, onValue, connectDatabaseEmulator } = await import('./lib/firebase-database.js'));
@@ -53,17 +54,17 @@ window.addEventListener('DOMContentLoaded', async () => {
   // listen to clearStorage value change
   onValue(ref(db, "QUESTIONS"), async (snapshot) => {
     if(!snapshot.val()) {
-      alert("No QUESTIONS data in firebase");
-      // const res = await fetch("http://localhost:8080/questionsData", {
-      //   method: 'GET',
-      //   headers: {
-      //     'Content-Type': 'application/json'
-      //   }
-      // });
-      // const response = await res.json();
-      // QUESTIONS = JSON.parse(response);
-      // set(ref(db, "QUESTIONS"), QUESTIONS);
-      // console.log("Fetch QUESTIONS from localhost:8080", QUESTIONS);
+      console.log("No QUESTIONS data in firebase");
+      const res = await fetch("http://localhost:8080/questionsData", {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const response = await res.json();
+      QUESTIONS = JSON.parse(response);
+      set(ref(db, "QUESTIONS"), QUESTIONS);
+      console.log("Fetch QUESTIONS from localhost:8080", QUESTIONS);
     } else {
       QUESTIONS = snapshot.val();
       nextQuestionSelfPractice();
@@ -240,7 +241,7 @@ function nextQuestionSelfPractice(nextSetName) {
         if((correctQuizAnswer || q.options[0].vi === undefined || q.options[0].vi === '') && !answerChecked) {
           // student Name
           const studentName = localStorage.getItem("Q1Name") ? localStorage.getItem("Q1Name") : 'Người chơi 1' + Math.floor(Math.random() * 1000000);
-          setFirebaseValue("SelfPractice/" + studentName + "/type_" + setName + "_" + jpInput.value.trim().toLowerCase(), setInputbyJP.includes(setName) ? jpInput.value.trim().length : 1);
+          setFirebaseValue("SelfPractice/" + studentName + "/type_" + setName + "_" + jpInput.value.trim().toLowerCase(), setInputbyJP.includes(setName) ? jpInput.value.trim().length : setInputHalfPoint.includes(setName) ? 0.5 : 1);
         }
       } else {
         jpInput.style.backgroundColor = ""

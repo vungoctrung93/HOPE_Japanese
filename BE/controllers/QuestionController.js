@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const { response } = require('express');
-var { QUESTIONS } = require('../data/questions');
+const { QUESTIONS } = require('../data/QUESTIONS');
 const { time, log } = require('node:console');
 const { off } = require('node:process');
 const logger = require('../middleware/logger').logger;
